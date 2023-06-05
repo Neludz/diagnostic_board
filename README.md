@@ -1,5 +1,4 @@
 # diagnostic_board
-==========================
 
 Overview
 --------
