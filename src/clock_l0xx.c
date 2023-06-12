@@ -21,12 +21,8 @@
 #define POWER_VOLTAGE   LL_PWR_REGU_VOLTAGE_SCALE1
 #endif
 
-#if !defined(USE_HSE_BYPASS) && !defined(USE_HSE)
+#if !defined(USE_HSE_BYPASS) && !defined(USE_HSE) && !defined(USE_HSI_4)
 #define USE_HSE_BYPASS
-#endif
-
-#if SYSCLK_FREQ != HSE_VALUE
-#define USE_PLL
 #endif
 
 #if !defined(PLL_MUL)
@@ -70,17 +66,27 @@ void ClockInit(void)
     /* Configure voltage*/
     LL_PWR_SetRegulVoltageScaling(POWER_VOLTAGE);
 
-#ifdef USE_HSE_BYPASS
+#if defined USE_HSE_BYPASS
     LL_RCC_HSE_EnableBypass();
     LL_RCC_HSE_Enable();
-#elif USE_HSE
-    LL_RCC_HSE_Enable
-#endif
-
-    while(!LL_RCC_HSE_IsReady ())
+        while(!LL_RCC_HSE_IsReady ())
     {
         // Wait HSE
     }
+#elif defined USE_HSE
+    LL_RCC_HSE_Enable();
+        while(!LL_RCC_HSE_IsReady ())
+    {
+        // Wait HSE
+    }
+#elif defined USE_HSI_4
+    LL_RCC_HSI_EnableDivider();
+    LL_RCC_HSI_Enable();
+        while(!LL_RCC_HSI_IsReady ())
+    {
+        // Wait HSE
+    }
+#endif
 
 #ifdef USE_PLL
     LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, PLL_MUL, PLL_DIV);
@@ -98,9 +104,15 @@ void ClockInit(void)
     }
     LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
 
-#ifdef USE_PLL
+#if defined USE_PLL
     LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
     while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL)
+    {
+        // Wait ClkSource
+    }
+#elif defined USE_HSI_4
+    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI);
+    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI)
     {
         // Wait ClkSource
     }

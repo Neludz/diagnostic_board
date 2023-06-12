@@ -498,7 +498,7 @@
 1684501557 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\ll\inc\stm32l0xx_ll_system.h
 	"stm32l0xx.h"
 
-1685787523 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\clock_l0xx.c
+1686055025 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\clock_l0xx.c
 	"clock_l0xx.h"
 	"stm32l0xx_ll_rcc.h"
 	"stm32l0xx_ll_system.h"
@@ -507,9 +507,9 @@
 	"stm32l0xx.h"
 	"main.h"
 
-1685878449 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\clock_l0xx.h
+1686054429 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\clock_l0xx.h
 
-1685697518 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.h
+1686318407 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.h
 	"clock_l0xx.h"
 	"stm32l0xx_ll_conf.h"
 
@@ -556,26 +556,29 @@
 	<stdint.h>
 	<stdio.h>
 
-1685973072 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\io_stm32l0xx.c
+1686205777 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\io_stm32l0xx.c
 	<stdint.h>
 	<stdbool.h>
 	<IO_stm32l0xx.h>
 	<stm32l0xx_ll_bus.h>
 	<stm32l0xx_ll_adc.h>
 	<stm32l0xx_ll_lpuart.h>
+	<stm32l0xx_ll_dma.h>
 	<main.h>
 
-1685978173 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\io_stm32l0xx.h
+1686236407 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\io_stm32l0xx.h
 	<stdint.h>
 	<stdbool.h>
 	"stm32l0xx.h"
 
-1685974516 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.c
+1686318792 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.c
 	"main.h"
 	"stm32l0xx.h"
 	<IO_stm32l0xx.h>
 	<stm32l0xx_ll_adc.h>
 	<stdio.h>
+	<string.h>
+	<ntc_sensor.h>
 
 1684501557 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\ll\src\stm32l0xx_ll_adc.c
 	"stm32l0xx_ll_adc.h"
@@ -584,4 +587,12 @@
 
 1684501556 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\system_stm32l0xx.c
 	"stm32l0xx.h"
+
+1686042109 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\ll\inc\stm32l0xx_ll_bus.c
+
+1686215064 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\ntc_sensor.c
+	<ntc_sensor.h>
+
+1686215116 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\ntc_sensor.h
+	<stdio.h>
 

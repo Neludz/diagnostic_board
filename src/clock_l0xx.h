@@ -2,10 +2,13 @@
 #define CLOCK_L0XX_H_INCLUDED
 
 // config: use stm32 ll driver
+//HSI only with dev 4 and without PLL
 //#define USE_HSE
-#define USE_HSE_BYPASS
-#define HSE_VALUE           8000000U
-#define SYSCLK_FREQ         6000000U
+//#define USE_PLL
+//#define USE_HSE_BYPASS
+//#define HSE_VALUE             8000000U
+#define USE_HSI_4
+#define SYSCLK_FREQ             4000000U
 #define  PREFETCH_ENABLE
 #define  PREREAD_ENABLE
 //#define  BUFFER_CACHE_DISABLE

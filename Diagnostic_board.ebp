@@ -87,6 +87,9 @@
 		<Unit filename="inc\stm32l0xx.h" />
 		<Unit filename="inc\system_stm32l0xx.h" />
 		<Unit filename="LL\Inc\stm32l0xx_ll_adc.h" />
+		<Unit filename="LL\Inc\stm32l0xx_ll_bus.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="LL\Inc\stm32l0xx_ll_bus.h" />
 		<Unit filename="LL\Inc\stm32l0xx_ll_comp.h" />
 		<Unit filename="LL\Inc\stm32l0xx_ll_conf.h" />
@@ -184,6 +187,12 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src\main.h" />
+		<Unit filename="src\ntc_sensor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\ntc_sensor.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="src\startup_stm32l010x4.S">
 			<Option compilerVar="CC" />
 			<Option weight="0" />

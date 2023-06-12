@@ -70,9 +70,9 @@ typedef enum
 
 enum
 {
-    ADC_TEMP,
-    ADC_VOLT_HI,
-    ADC_VOLT_MID,
+    ADC_TEMP_NUM,
+    ADC_V_HI_NUM,
+    ADC_V_MID_NUM,
 };
 
 //          NAME    GPIOx   GPIO_Pin    MODE    AF  DefState  ActiveState

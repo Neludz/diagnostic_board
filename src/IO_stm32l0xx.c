@@ -5,11 +5,13 @@
 #include <stm32l0xx_ll_bus.h>
 #include <stm32l0xx_ll_adc.h>
 #include <stm32l0xx_ll_lpuart.h>
+#include <stm32l0xx_ll_dma.h>
 #include <main.h>
 //------------------------------- prototype -------------------------------------
 static void IO_ADC_Init(void);
 static void IO_ConfigLine(tGPIO_Line io);
 static void IO_UARTC_Init(void);
+static void IO_DMA_Init(void);
 //--------------X macros---------------------------------------------------------
 const tGPIO_Line IOs[NUM_IO] =
 {
@@ -19,6 +21,7 @@ const tGPIO_Line IOs[NUM_IO] =
 };
 //--------------------------------- variable -------------------------------------
 const uint8_t IO_ADC_number[ADC_NUMBER] = ADC_NUMBER_LIST;
+uint16_t adc_data[ADC_NUMBER];
 //---------------------------------------------------------------------------------
 void IO_SetLine(tIOLine Line, bool State)
 {
@@ -71,7 +74,9 @@ void IO_Init(void)
         IO_ConfigLine(IOs[Line]);
     }
     IO_ADC_Init();
+
     IO_UARTC_Init();
+    IO_DMA_Init();
 }
 
 static void IO_ConfigLine(tGPIO_Line io)
@@ -107,29 +112,30 @@ static void IO_ADC_Init(void)
 {
     LL_ADC_SetCommonFrequencyMode(ADC1_COMMON, LL_ADC_CLOCK_FREQ_MODE_LOW);  //if adc clock low then 3,5 MHz
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_ADC1); // clock enable
-    LL_ADC_SetClock(ADC1, LL_ADC_CLOCK_SYNC_PCLK_DIV1); // PCLK prescaler
+    LL_ADC_SetClock(ADC1, LL_ADC_CLOCK_SYNC_PCLK_DIV4); // PCLK prescaler
     LL_ADC_SetResolution(ADC1, LL_ADC_RESOLUTION_10B);        // Resolution
 
     LL_ADC_EnableInternalRegulator(ADC1);
-    LL_ADC_SetSamplingTimeCommonChannels(ADC1, LL_ADC_SAMPLINGTIME_1CYCLE_5);
+    LL_ADC_SetSamplingTimeCommonChannels(ADC1, LL_ADC_SAMPLINGTIME_3CYCLES_5);
     //LL_ADC_SAMPLINGTIME_79CYCLES_5
-
 
     for(int i = 0; i < ADC_NUMBER; i++)
     {
         LL_ADC_REG_SetSequencerChAdd(ADC1, (1<<IO_ADC_number[i]));
     }
+    //LL_ADC_REG_SetOverrun(ADC1, LL_ADC_REG_OVR_DATA_OVERWRITTEN);
     LL_ADC_StartCalibration(ADC1);
     while(LL_ADC_IsCalibrationOnGoing(ADC1))
     {
 
     }
+    LL_ADC_REG_SetDMATransfer(ADC1,  LL_ADC_REG_DMA_TRANSFER_LIMITED);
     LL_ADC_Enable(ADC1);
-    LL_ADC_EnableIT_EOC(ADC1);
-    LL_ADC_EnableIT_EOS(ADC1);
-    NVIC_SetPriority(ADC1_IRQn, 1);
-    NVIC_EnableIRQ(ADC1_IRQn);
 
+   // LL_ADC_EnableIT_EOC(ADC1);
+    //LL_ADC_EnableIT_EOS(ADC1);
+    //NVIC_SetPriority(ADC1_IRQn, 1);
+    //NVIC_EnableIRQ(ADC1_IRQn);
 }
 
 static void IO_UARTC_Init(void)
@@ -142,10 +148,38 @@ static void IO_UARTC_Init(void)
     LL_LPUART_SetBaudRate(LPUART1, SYSCLK_FREQ, BAUDRATE);
     LL_LPUART_EnableDirectionTx(LPUART1);
 
+    //LL_LPUART_EnableDMAReq_TX(LPUART1);
+
     LL_LPUART_EnableIT_TC(LPUART1);
-    // LL_LPUART_EnableIT_TXE(LPUART1);
+
     LL_LPUART_Enable(LPUART1);
     NVIC_SetPriority(LPUART1_IRQn, 1);
     NVIC_EnableIRQ(LPUART1_IRQn);
+}
+
+static void IO_DMA_Init(void)
+{
+    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
+    LL_AHB1_GRP1_EnableClockSleep(LL_AHB1_GRP1_PERIPH_DMA1);
+
+    LL_DMA_ConfigTransfer(DMA1, LL_DMA_CHANNEL_1, (LL_DMA_DIRECTION_PERIPH_TO_MEMORY |\
+                                                   LL_DMA_MODE_CIRCULAR |\
+                                                   LL_DMA_MEMORY_INCREMENT |\
+                                                   LL_DMA_PERIPH_NOINCREMENT |\
+                                                   LL_DMA_MDATAALIGN_HALFWORD |\
+                                                   LL_DMA_PDATAALIGN_HALFWORD ));
+
+    LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_1, LL_DMA_REQUEST_0);
+
+    LL_DMA_ConfigAddresses(DMA1, LL_DMA_CHANNEL_1, (uint32_t)(&(ADC1->DR)),
+                          (uint32_t)&adc_data, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+
+    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, ADC_NUMBER);
+    LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_1);
+    LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_1);
+    LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_1);
+    NVIC_EnableIRQ(DMA1_Channel1_IRQn); /* (1) */
+    NVIC_SetPriority(DMA1_Channel1_IRQn,1); /* (2) */
+
 }
 
