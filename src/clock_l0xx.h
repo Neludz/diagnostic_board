@@ -16,10 +16,12 @@
 #define PLL_MUL             LL_RCC_PLL_MUL_3
 #define PLL_DIV             LL_RCC_PLL_DIV_4
 
+#define AHB_PRE_DEV         LL_RCC_SYSCLK_DIV_1
+
 //01: 1.8 V (range 1)   LL_PWR_REGU_VOLTAGE_SCALE1
 //10: 1.5 V (range 2)   LL_PWR_REGU_VOLTAGE_SCALE2
 //11: 1.2 V (range 3)   LL_PWR_REGU_VOLTAGE_SCALE3
-#define POWER_VOLTAGE       LL_PWR_REGU_VOLTAGE_SCALE1
+#define POWER_VOLTAGE       LL_PWR_REGU_VOLTAGE_SCALE3
 
 void ClockInit(void);
 

@@ -102,7 +102,7 @@ void ClockInit(void)
     {
         // Wait latency
     }
-    LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
+    LL_RCC_SetAHBPrescaler(AHB_PRE_DEV);
 
 #if defined USE_PLL
     LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);

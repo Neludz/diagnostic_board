@@ -39,7 +39,6 @@
 #define AF_6   (0x06)
 #define AF_7   (0x07)
 
-
 typedef struct
 {
     GPIO_TypeDef* GPIOx;
@@ -58,14 +57,15 @@ typedef enum
     HIGH =1,
 } tIOState;
 
-
 #define ADC_NUMBER              3
 
 #define	ADC_TEMP_CHANNEL        4
 #define	ADC_V_MID_CHANNEL       7
 #define	ADC_V_HI_CHANNEL        6
 #define ADC_NUMBER_LIST        {ADC_TEMP_CHANNEL, ADC_V_MID_CHANNEL, ADC_V_HI_CHANNEL}
-
+#define MV_ADC  				3300
+#define ADC_COUNTS  			(1<<10)
+#define MODE_LEGACY             0   //0 or 1
 #define BAUDRATE                38400
 
 enum
@@ -82,12 +82,12 @@ enum
     X_IO(io_addr2,			GPIOB,  4,      (IN | PULL_UP),	0,		0,  	LOW)	\
     X_IO(io_addr3,			GPIOA,  15,     (IN | PULL_UP),	0,		0,  	LOW)	\
     X_IO(io_mode,			GPIOA,  10,     (IN | PULL_UP),	0,		0,  	LOW)	\
-    X_IO(io_mid_error,      GPIOA,  9,      (IN | NO_PULL),	0,		0,  	LOW)	\
-    X_IO(io_hi_error,       GPIOA,  8,      (IN | NO_PULL),	0,		0,  	LOW)	\
     X_IO(io_adc_temp_I4,	GPIOA,  4,      (AI | NO_PULL),	0,		0,  	LOW)	\
     X_IO(io_adc_volt_mid_I7,GPIOA,  7,      (AI | NO_PULL),	0,		0,  	LOW)	\
     X_IO(io_adc_volt_hi_I6, GPIOA,  6,      (AI | NO_PULL),	0,		0,  	LOW)	\
     X_IO(io_uart_tx,        GPIOB,  6,      (ALT | PP | SP_VHI | NO_PULL),  AF_6,   0,  LOW)	\
+    X_IO(io_mid_error,      GPIOA,  9,      (IN | NO_PULL),	0,		0,  	LOW)	\
+    X_IO(io_hi_error,       GPIOA,  8,      (IN | NO_PULL),	0,		0,  	LOW)	\
 
 
 
@@ -101,6 +101,8 @@ typedef enum
 
 void IO_Init(void);
 bool IO_GetLineActive(tIOLine Line);
+void IO_UARTC_Init(uint32_t mode);
+void IO_DeConfigLine(tIOLine Line);
 
 #endif /* _IO_H */
 

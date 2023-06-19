@@ -10,7 +10,6 @@
 //------------------------------- prototype -------------------------------------
 static void IO_ADC_Init(void);
 static void IO_ConfigLine(tGPIO_Line io);
-static void IO_UARTC_Init(void);
 static void IO_DMA_Init(void);
 //--------------X macros---------------------------------------------------------
 const tGPIO_Line IOs[NUM_IO] =
@@ -71,11 +70,8 @@ void IO_Init(void)
     for (int Line = 0; Line < NUM_IO; Line++)
     {
         IO_ConfigLine(IOs[Line]);
-        IO_ConfigLine(IOs[Line]);
     }
     IO_ADC_Init();
-
-    IO_UARTC_Init();
     IO_DMA_Init();
 }
 
@@ -108,6 +104,14 @@ static void IO_ConfigLine(tGPIO_Line io)
     io.GPIOx->ODR |= (io.DefState << io.GPIO_Pin);
 }
 
+ void IO_DeConfigLine(tIOLine Line)
+{
+
+    IOs[Line].GPIOx->PUPDR &= ~(0x03 << (IOs[Line].GPIO_Pin * 2));
+    IOs[Line].GPIOx->PUPDR |= (0x02 << (IOs[Line].GPIO_Pin * 2));
+
+}
+
 static void IO_ADC_Init(void)
 {
     LL_ADC_SetCommonFrequencyMode(ADC1_COMMON, LL_ADC_CLOCK_FREQ_MODE_LOW);  //if adc clock low then 3,5 MHz
@@ -131,21 +135,20 @@ static void IO_ADC_Init(void)
     }
     LL_ADC_REG_SetDMATransfer(ADC1,  LL_ADC_REG_DMA_TRANSFER_LIMITED);
     LL_ADC_Enable(ADC1);
-
-   // LL_ADC_EnableIT_EOC(ADC1);
-    //LL_ADC_EnableIT_EOS(ADC1);
-    //NVIC_SetPriority(ADC1_IRQn, 1);
-    //NVIC_EnableIRQ(ADC1_IRQn);
 }
 
-static void IO_UARTC_Init(void)
+void IO_UARTC_Init(uint32_t mode)
 {
 
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_LPUART1);
 
-    LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_8B);
+    if (mode == MODE_LEGACY)
+        LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_8B);
+    else
+        LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_9B);
+
     LL_LPUART_SetStopBitsLength(LPUART1, LL_USART_STOPBITS_1);
-    LL_LPUART_SetBaudRate(LPUART1, SYSCLK_FREQ, BAUDRATE);
+    LL_LPUART_SetBaudRate(LPUART1, (SYSCLK_FREQ), BAUDRATE);
     LL_LPUART_EnableDirectionTx(LPUART1);
 
     //LL_LPUART_EnableDMAReq_TX(LPUART1);
@@ -163,16 +166,16 @@ static void IO_DMA_Init(void)
     LL_AHB1_GRP1_EnableClockSleep(LL_AHB1_GRP1_PERIPH_DMA1);
 
     LL_DMA_ConfigTransfer(DMA1, LL_DMA_CHANNEL_1, (LL_DMA_DIRECTION_PERIPH_TO_MEMORY |\
-                                                   LL_DMA_MODE_CIRCULAR |\
-                                                   LL_DMA_MEMORY_INCREMENT |\
-                                                   LL_DMA_PERIPH_NOINCREMENT |\
-                                                   LL_DMA_MDATAALIGN_HALFWORD |\
-                                                   LL_DMA_PDATAALIGN_HALFWORD ));
+                          LL_DMA_MODE_CIRCULAR |\
+                          LL_DMA_MEMORY_INCREMENT |\
+                          LL_DMA_PERIPH_NOINCREMENT |\
+                          LL_DMA_MDATAALIGN_HALFWORD |\
+                          LL_DMA_PDATAALIGN_HALFWORD ));
 
     LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_1, LL_DMA_REQUEST_0);
 
     LL_DMA_ConfigAddresses(DMA1, LL_DMA_CHANNEL_1, (uint32_t)(&(ADC1->DR)),
-                          (uint32_t)&adc_data, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+                           (uint32_t)&adc_data, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, ADC_NUMBER);
     LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_1);

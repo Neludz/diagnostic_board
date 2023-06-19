@@ -20,21 +20,24 @@ extern "C" {
 
 #define WWDG_COUNTER    0x7F
 
-#define ADC_TIME_MS             60
-#define UART_TIME_1_MS          55
-#define UART_TIME_2_MS          60
+#define ADC_TIME_MS             20
+#define ADC_DELAY_LEGACY_MS     30
+#define ADC_DELAY_MODERN_MS     80
+#define UART_TIME_LEGASY_MS     55
+#define UART_TIME_MODERN_MS     20
 
 #define SYSTIMER_TICK           1000
 #define SYSTIMER_MS_TO_TICK(x)  ((SYSTIMER_TICK * x) / 1000)
 #define ADC_TIME                SYSTIMER_MS_TO_TICK(ADC_TIME_MS)
 
-
-#define MV_ADC  				3300
 #define R_LOW_DEV_OHM_ADC 		200
 #define R_HIGH_DEV_OHM_ADC 		70500
-#define ADC_COUNTS  			(1<<10)
-
-
+//#define K_SHEME_X100            200
+#define K_VOLT_MV               ((MV_ADC * (R_LOW_DEV_OHM_ADC + R_HIGH_DEV_OHM_ADC))/(R_LOW_DEV_OHM_ADC * ADC_COUNTS))
+#define K_FILTER_VOLT           43      //1..255
+#define K_FILTER_TEMPERATURE    1       //1..255
+#define THRESHOLD_LOW_DIGIT     7
+#define THRESHOLD_HI_DIGIT      30
 
 #ifdef __cplusplus
 }

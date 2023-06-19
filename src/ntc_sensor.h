@@ -3,11 +3,11 @@
 
 #include <stdio.h>
 
-#define TEMPERATURE_UNDER 8888
-#define TEMPERATURE_OVER 9999
-#define TEMPERATURE_TABLE_START -10
+#define TEMPERATURE_UNDER 150
+#define TEMPERATURE_OVER 150
+#define TEMPERATURE_TABLE_START -40
 #define TEMPERATURE_TABLE_STEP 1
-
+#define TEMPERATURE_TABLE_SIZE 166
 
 typedef uint32_t temperature_table_entry_type;
 typedef uint8_t temperature_table_index_type;
