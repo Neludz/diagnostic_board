@@ -141,12 +141,7 @@ void IO_UARTC_Init(uint32_t mode)
 {
 
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_LPUART1);
-
-    if (mode == MODE_LEGACY)
-        LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_8B);
-    else
-        LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_9B);
-
+    LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_9B);
     LL_LPUART_SetStopBitsLength(LPUART1, LL_USART_STOPBITS_1);
     LL_LPUART_SetBaudRate(LPUART1, (SYSCLK_FREQ), BAUDRATE);
     LL_LPUART_EnableDirectionTx(LPUART1);

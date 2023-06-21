@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ntc_sensor.h>
-
+//-------------------------------------------------------------------------
 uint32_t  adc_value_v_mid = 0, adc_value_v_hi = 0, adc_average_v_mid = 0, adc_average_v_hi = 0;
 int16_t adc_value_temper = 0;
 extern uint16_t adc_data[];
@@ -53,8 +53,7 @@ const unsigned char crc_array[256] =
     0x74, 0x2a, 0xc8, 0x96, 0x15, 0x4b, 0xa9, 0xf7,
     0xb6, 0xe8, 0x0a, 0x54, 0xd7, 0x89, 0x6b, 0x35,
 };
-
-
+//-------------------------------------------------------------------------
 void DMA1_Channel1_IRQHandler()
 {
     if (LL_DMA_IsActiveFlag_TC1(DMA1) || LL_DMA_IsActiveFlag_TE1(DMA1))
@@ -64,17 +63,17 @@ void DMA1_Channel1_IRQHandler()
         WRITE_REG(DMA1->IFCR, DMA_IFCR_CTEIF1 | DMA_IFCR_CTCIF1);
     }
 }
-
+//-------------------------------------------------------------------------
 void SysTick_Handler()
 {
     Tick++;
 }
-
+//-------------------------------------------------------------------------
 uint32_t MainTimerGetTick(void)
 {
     return Tick;
 }
-
+//-------------------------------------------------------------------------
 void LPUART1_IRQHandler()
 {
     if(LL_LPUART_IsActiveFlag_TXE(LPUART1))
@@ -95,15 +94,6 @@ void LPUART1_IRQHandler()
         uart_busy = 0;
     }
 }
-
-//-------------------------------------------------------------------------
-void IO_delay_ms(uint32_t ms)
-{
-    volatile uint32_t nCount;
-    nCount=(SYSCLK_FREQ/SYSTIMER_TICK)*ms;
-    for (; nCount!=0; nCount--);
-}
-
 //-------------------------------------------------------------------------
 bool Timer_Is_Expired (const uint32_t Timer)
 {
@@ -111,7 +101,6 @@ bool Timer_Is_Expired (const uint32_t Timer)
     TimeTick = Tick;
     return ((TimeTick - Timer) < (1UL << 31));
 }
-
 //-------------------------------------------------------------------------
 uint32_t Main_Timer_Set(const uint32_t AddTime)
 {
@@ -119,78 +108,91 @@ uint32_t Main_Timer_Set(const uint32_t AddTime)
     TimeTick = Tick;
     return TimeTick + AddTime;
 }
-
 //-------------------------------------------------------------------------
 void data_update(void)
 {
     adc_value_temper = calc_temperature(adc_filtered[ADC_TEMP_NUM]);
-    adc_value_v_mid = adc_average_v_mid * K_VOLT_MV/1000;
-    adc_value_v_hi = adc_average_v_hi * K_VOLT_MV/1000;
+    adc_value_v_mid = adc_average_v_mid * K_VOLT_MV/1000;//(adc_value_v_mid * 3 + adc_average_v_mid * K_VOLT_MV/1000) >> 2;
+    adc_value_v_hi =  adc_average_v_hi * K_VOLT_MV/1000;//(adc_value_v_hi * 3 + adc_average_v_hi * K_VOLT_MV/1000) >> 2;
 }
-
+//-------------------------------------------------------------------------
 void adc_processing(void)
 {
     static uint32_t intermediate_v_mid = 0, intermediate_v_hi = 0, intermediate_t;
-    static uint32_t adc_sum_v_mid = 0, adc_sum_v_hi = 0;
-    if (!adc_sleep)
+    static uint32_t adc_sum_v_mid = 0, adc_sum_v_hi = 0, adc_state = 0;
+    switch (adc_state)
     {
+    case 0:
         if(!adc_busy)
+            adc_state = 1;  //fall
+        else
+            break;
+    case 1:
+        // temperature
+        intermediate_t += (adc_data[ADC_TEMP_NUM] - adc_filtered[ADC_TEMP_NUM]);
+        adc_filtered[ADC_TEMP_NUM] = (intermediate_t * K_FILTER_TEMPERATURE) >> 8;
+        // v_hi
+        intermediate_v_hi += (adc_data[ADC_V_HI_NUM] - adc_filtered[ADC_V_HI_NUM]);
+        adc_filtered[ADC_V_HI_NUM] = (intermediate_v_hi * K_FILTER_VOLT) >> 8;
+        adc_sum_v_hi += adc_filtered[ADC_V_HI_NUM];
+        // v_mid
+        intermediate_v_mid += (adc_data[ADC_V_MID_NUM] - adc_filtered[ADC_V_MID_NUM]);
+        adc_filtered[ADC_V_MID_NUM] = (intermediate_v_mid * K_FILTER_VOLT) >> 8;
+        adc_sum_v_mid += adc_filtered[ADC_V_MID_NUM];
+        if (Timer_Is_Expired(adc_delay))
         {
-            // temperature
-            intermediate_t += (adc_data[ADC_TEMP_NUM] - adc_filtered[ADC_TEMP_NUM]);
-            adc_filtered[ADC_TEMP_NUM] = (intermediate_t * K_FILTER_TEMPERATURE) >> 8;
-            // v_hi
-            intermediate_v_hi += (adc_data[ADC_V_HI_NUM] - adc_filtered[ADC_V_HI_NUM]);
-            adc_filtered[ADC_V_HI_NUM] = (intermediate_v_hi * K_FILTER_VOLT) >> 8;
-            adc_sum_v_hi += adc_filtered[ADC_V_HI_NUM];
-            // v_mid
-            intermediate_v_mid += (adc_data[ADC_V_MID_NUM] - adc_filtered[ADC_V_MID_NUM]);
-            adc_filtered[ADC_V_MID_NUM] = (intermediate_v_mid * K_FILTER_VOLT) >> 8;
-            adc_sum_v_mid += adc_filtered[ADC_V_MID_NUM];
-            if (Timer_Is_Expired(adc_delay))
-            {
-                // v_hi
-                adc_average_v_hi = (adc_average_v_hi + ((adc_sum_v_hi / adc_iteration_count) * 255)) >> 8;
-                // v_mid
-                adc_average_v_mid = (adc_average_v_mid + ((adc_sum_v_mid / adc_iteration_count) * 255)) >> 8;
-                test = adc_iteration_count;
-                data_update();
-                adc_sum_v_hi = 0;
-                adc_sum_v_mid = 0;
-                adc_iteration_count = 0;
-                if (adc_threshold_start)
-                {
-                    adc_threshold_start = 0;
-                    adc_delay = Main_Timer_Set(ADC_TIME);
-                }
-                else
-                {
-                    adc_delay = Main_Timer_Set(ADC_DELAY_MODERN_MS);
-                    LL_ADC_DisableInternalRegulator(ADC1);
-                    LL_ADC_Disable(ADC1);
-                    adc_sleep = 1;
-                    return;
-                }
-            }
+            adc_state = 2; //fall
+        }
+        else
+        {
+            adc_state = 0;
+            adc_busy = 1;
+            LL_ADC_REG_StartConversion(ADC1);
+            break;
+        }
+    case 2:
+        // v_hi
+        adc_average_v_hi = (adc_average_v_hi + ((adc_sum_v_hi / adc_iteration_count) * 255)) >> 8;
+        // v_mid
+        adc_average_v_mid = (adc_average_v_mid + ((adc_sum_v_mid / adc_iteration_count) * 255)) >> 8;
+        test = adc_iteration_count;
+        data_update();
+        adc_sum_v_hi = 0;
+        adc_sum_v_mid = 0;
+        adc_iteration_count = 0;
+        if (adc_threshold_start)
+        {
+            adc_threshold_start = 0;
+            adc_delay = Main_Timer_Set(ADC_TIME);
+            adc_state = 0;
             adc_busy = 1;
             LL_ADC_REG_StartConversion(ADC1);
         }
-    }
-    else
-    {
+        else
+        {
+            adc_delay = Main_Timer_Set(ADC_DELAY_MODERN_MS);
+            LL_ADC_DisableInternalRegulator(ADC1);
+            LL_ADC_Disable(ADC1);
+            adc_state = 3;
+        }
+        break;
+    case 3:
         if (adc_threshold_start == 1 || Timer_Is_Expired(adc_delay))
         {
             adc_delay = Main_Timer_Set(ADC_TIME);
-            adc_sleep = 0;
+            adc_state = 0;
             adc_threshold_start = 0;
             LL_ADC_EnableInternalRegulator(ADC1);
             LL_ADC_Enable(ADC1);
             adc_busy = 1;
             LL_ADC_REG_StartConversion(ADC1);
         }
+        break;
+    default :
+        break;
     }
 }
-
+//-------------------------------------------------------------------------
 uint32_t fill_buffer_legacy()
 {
     uint32_t delta, i;
@@ -200,10 +202,12 @@ uint32_t fill_buffer_legacy()
     uart_buffer[0] = address << 3;
     // delta
     delta = (adc_average_v_mid * ADC_COUNTS) / adc_average_v_hi;
-    if (delta >= ADC_COUNTS)
-        delta = ADC_COUNTS - 1;
-    uart_buffer[1] = delta >> 5;
-    uart_buffer[2] = delta & 0x1F;
+    delta = delta >> 2; // 8bit
+    if (delta >= 0xFF)
+        delta = 0xFE;
+
+    uart_buffer[1] = ((delta >> 4) << 1) | 1;
+    uart_buffer[2] = ((delta & 0xF) << 1) | 1;
     //temperature
     if (adc_value_temper >= TEMPERATURE_UNDER)
     {
@@ -219,11 +223,11 @@ uint32_t fill_buffer_legacy()
     {
         crc = crc ^ (uart_buffer[i] & 0xFF);
     }
-    crc = crc ^ 0x80;
+    crc = crc^ 0x80;
     uart_buffer[4] = crc;
     return 5;
 }
-
+//-------------------------------------------------------------------------
 unsigned char dallas_crc8(const unsigned int size)
 {
     unsigned char crc = 0;
@@ -233,11 +237,11 @@ unsigned char dallas_crc8(const unsigned int size)
     }
     return crc;
 }
-
+//-------------------------------------------------------------------------
 uint32_t fill_buffer_modern()
 {
     uint32_t delta, i;
-    int8_t temperature;
+    int16_t temperature;
     uint8_t crc;
     // addr
     uart_buffer[0] = address << 4;
@@ -246,7 +250,6 @@ uint32_t fill_buffer_modern()
         delta = (1<<12);
     else
         delta = adc_value_v_mid;
-
     uart_buffer[1] = (((delta >> 7) & 0x7F) << 1) | 0x01;
     uart_buffer[2] = ((delta & 0x7F) << 1) | 0x01;
 
@@ -254,13 +257,15 @@ uint32_t fill_buffer_modern()
         delta = adc_value_v_hi - adc_value_v_mid;
     else
         delta = 0;
-
     uart_buffer[3] = (((delta >> 7) & 0x7F) << 1) | 0x01;
     uart_buffer[4] = ((delta & 0x7F) << 1) | 0x01;
 
     // temperature
     if (adc_value_temper >= TEMPERATURE_UNDER)
+    {
         temperature = 224;
+        uart_buffer[0] |= (0x01 << 3);
+    }
     else
         temperature = adc_value_temper + 60;
     uart_buffer[5] = temperature | 0x01;
@@ -270,7 +275,7 @@ uint32_t fill_buffer_modern()
     uart_buffer[6] = crc | 0x100;
     return 7;
 }
-
+//-------------------------------------------------------------------------
 uint32_t threshold_update(void)
 {
     static uint32_t v_hi_threshold_hi = 0;
@@ -286,56 +291,78 @@ uint32_t threshold_update(void)
     }
     return 0;
 }
-
+//-------------------------------------------------------------------------
 void uart_processing(void)
 {
-    if ( Timer_Is_Expired(uart_delay) || v_wait_threshold == 1)
+    static uint32_t uart_state = 0;
+
+    switch (uart_state)
     {
+    case 0:
+        if ( Timer_Is_Expired(uart_delay))
+            uart_state = 1; //fall
+        else
+            break;
+    case 1:
         if (mode == MODE_LEGACY)
         {
             adc_threshold_start = 1;
-            v_wait_threshold = 1;
-            if (threshold_update())
-            {
-                uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(UART_TIME_LEGASY_MS));
-                v_wait_threshold = 0;
-                if(uart_busy == 0)
-                {
-                    tx_count = fill_buffer_legacy();
-                    tx_index = 0;
-                    uart_busy = 1;
-                    LL_LPUART_EnableIT_TXE(LPUART1);
-                }
-            }
+            uart_state = 2;     //fall
         }
         else
         {
-            uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(UART_TIME_MODERN_MS));
+            uart_state = 3;
+            break;
+        }
+    case 2: //legacy
+        if (threshold_update())
+        {
+            uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(UART_TIME_LEGASY_MS));
+            uart_state = 0;
             if(uart_busy == 0)
             {
-
-                tx_count = fill_buffer_modern();
+                tx_count = fill_buffer_legacy();
                 tx_index = 0;
                 uart_busy = 1;
                 LL_LPUART_EnableIT_TXE(LPUART1);
             }
         }
+        break;
+    case 3: //modern
+        uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(UART_TIME_MODERN_MS));
+        uart_state = 0;
+        if(uart_busy == 0)
+        {
+            tx_count = fill_buffer_modern();
+            tx_index = 0;
+            uart_busy = 1;
+            LL_LPUART_EnableIT_TXE(LPUART1);
+        }
+        break;
+    default:
+        break;
     }
 }
-
+//-------------------------------------------------------------------------
 void print()
 {
     if (Timer_Is_Expired(print_delay))
     {
-        printf("adc_hi %d\n", adc_value_v_hi);
-        printf("count_______ %d\n", test);
-        print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(1500));
+        print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(2000));
+        printf(" uart_buffer[0] = %d\n",  uart_buffer[0]);
+        printf(" uart_buffer[1] = %d\n",  uart_buffer[1]);
+        printf(" uart_buffer[2] = %d\n",  uart_buffer[2]);
+        printf(" uart_buffer[3] = %d\n",  uart_buffer[3]);
+        printf(" uart_buffer[4] = %d\n",  uart_buffer[4]);
+        printf(" uart_buffer[5] = %d\n",  uart_buffer[5]);
+        printf("==============================\n");
+
+
     }
 }
-
+//-------------------------------------------------------------------------
 void flash_btock(void)
 {
-//----------
     uint8_t rdp_level = READ_BIT(FLASH->OPTR, FLASH_OPTR_RDPROT);
     if (rdp_level != RDP_VAL)
     {
@@ -380,7 +407,7 @@ void flash_btock(void)
         SET_BIT(FLASH->PECR, FLASH_PECR_OPTLOCK);
     }
 }
-
+//-------------------------------------------------------------------------
 void wd_init(void)
 {
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
@@ -389,7 +416,6 @@ void wd_init(void)
     LL_WWDG_SetWindow(WWDG, WWDG_COUNTER);
     LL_WWDG_Enable(WWDG);
 }
-
 //-------------------------------------------------------------------------
 int main(void)
 {
@@ -402,7 +428,7 @@ int main(void)
         __WFI();
     }
     //flash_btock();
-    //wd_init();
+    wd_init();
     IO_Init();
     print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(100));
     while (!Timer_Is_Expired(print_delay))
@@ -417,22 +443,29 @@ int main(void)
     IO_DeConfigLine(io_addr2);
     IO_DeConfigLine(io_addr3);
     IO_DeConfigLine(io_mode);
-
+#ifdef DEBU_USER
     printf ( "[ INFO ] Program start now\n" );
+#endif
+
 
     for (i =0; i<ADC_NUMBER; i++)
     {
         adc_filtered[i] = 0;
         adc_data[i] = 0;
     }
-    uart_delay = Main_Timer_Set(1000);
+    uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(1000));
     while(1)
     {
+#ifdef DEBU_USER
         print();
+#endif
+        //
         // __WFI();
         __WFE();
-        adc_processing();
         uart_processing();
-        //  LL_WWDG_SetCounter(WWDG, WWDG_COUNTER);
+        adc_processing();
+
+        LL_WWDG_SetCounter(WWDG, WWDG_COUNTER);
     }
 }
+//-------------------------------------------------------------------------

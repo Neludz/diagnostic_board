@@ -224,9 +224,9 @@
 	"stm32l0xx.h"
 	"main.h"
 
-1687172534 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\clock_l0xx.h
+1687184789 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\clock_l0xx.h
 
-1687183997 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.h
+1687337913 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.h
 	"clock_l0xx.h"
 	"stm32l0xx_ll_conf.h"
 
@@ -270,7 +270,7 @@
 	<stdint.h>
 	<stdio.h>
 
-1687173209 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\io_stm32l0xx.c
+1687249582 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\io_stm32l0xx.c
 	<stdint.h>
 	<stdbool.h>
 	<IO_stm32l0xx.h>
@@ -285,7 +285,7 @@
 	<stdbool.h>
 	"stm32l0xx.h"
 
-1687183961 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.c
+1687343318 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.c
 	"main.h"
 	"stm32l0xx.h"
 	<IO_stm32l0xx.h>

@@ -32,7 +32,7 @@ extern "C" {
 
 #define R_LOW_DEV_OHM_ADC 		200
 #define R_HIGH_DEV_OHM_ADC 		70500
-//#define K_SHEME_X100            200
+//#define K_SHEME_X100            141
 #define K_VOLT_MV               ((MV_ADC * (R_LOW_DEV_OHM_ADC + R_HIGH_DEV_OHM_ADC))/(R_LOW_DEV_OHM_ADC * ADC_COUNTS))
 #define K_FILTER_VOLT           43      //1..255
 #define K_FILTER_TEMPERATURE    1       //1..255
