@@ -350,11 +350,6 @@ void print()
     {
         print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(2000));
         printf(" uart_buffer[0] = %d\n",  uart_buffer[0]);
-        printf(" uart_buffer[1] = %d\n",  uart_buffer[1]);
-        printf(" uart_buffer[2] = %d\n",  uart_buffer[2]);
-        printf(" uart_buffer[3] = %d\n",  uart_buffer[3]);
-        printf(" uart_buffer[4] = %d\n",  uart_buffer[4]);
-        printf(" uart_buffer[5] = %d\n",  uart_buffer[5]);
         printf("==============================\n");
 
 
