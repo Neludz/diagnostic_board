@@ -7,6 +7,7 @@ extern "C" {
 
 #include "clock_l0xx.h"
 #include "stm32l0xx_ll_conf.h"
+#include <IO_stm32l0xx.h>
 
 #define BOR_OFF         ((uint8_t)0x00) /*!< BOR is disabled at power down, the reset is asserted when the VDD
                                              power supply reaches the PDR(Power Down Reset) threshold (1.5V) */
@@ -19,9 +20,10 @@ extern "C" {
 #define RDP_VAL         0xBB
 
 #define WWDG_COUNTER    0x7F
+#define IWDG_TIME_X_0_1S    200 // 20s
 
 #define ADC_TIME_MS             20
-#define ADC_DELAY_LEGACY_MS     30
+//#define ADC_DELAY_LEGACY_MS     30
 #define ADC_DELAY_MODERN_MS     80
 #define UART_TIME_LEGASY_MS     55
 #define UART_TIME_MODERN_MS     20
@@ -33,11 +35,22 @@ extern "C" {
 #define R_LOW_DEV_OHM_ADC 		200
 #define R_HIGH_DEV_OHM_ADC 		70500
 //#define K_SHEME_X100            141
-#define K_VOLT_MV               ((MV_ADC * (R_LOW_DEV_OHM_ADC + R_HIGH_DEV_OHM_ADC))/(R_LOW_DEV_OHM_ADC * ADC_COUNTS))
-#define K_FILTER_VOLT           43      //1..255
-#define K_FILTER_TEMPERATURE    1       //1..255
-#define THRESHOLD_LOW_DIGIT     7
-#define THRESHOLD_HI_DIGIT      30
+#define K_VOLT_MV               ((MV_ADC * (R_LOW_DEV_OHM_ADC + R_HIGH_DEV_OHM_ADC)+((R_LOW_DEV_OHM_ADC * ADC_COUNTS)>>1))/(R_LOW_DEV_OHM_ADC * ADC_COUNTS))
+#define K_FILTER_VOLT           15     //1..255
+#define K_FILTER_B_VOLT         20     //1..255
+#define K_FILTER_D_VOLT         50     //1..255
+#define K_FILTER_TEMPERATURE    1      //1..255
+#define THRESHOLD_LOW_DIGIT     32
+#define THRESHOLD_HI_DIGIT      120
+
+#define R_TEMPER_DIVIDER        5100
+#define R_TEMPER_LEGACY_R0      1854
+#define R_TEMPER_MODERN_R0      1000
+#define K_TEMPER_A_INVERSE_X100 394
+#define TEMPERATURE_MAX         140
+#define TEMPERATURE_MIN         -40
+#define TEMPERATURE_SPAN        181
+
 
 #ifdef __cplusplus
 }

@@ -116,8 +116,8 @@ static void IO_ADC_Init(void)
 {
     LL_ADC_SetCommonFrequencyMode(ADC1_COMMON, LL_ADC_CLOCK_FREQ_MODE_LOW);  //if adc clock low then 3,5 MHz
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_ADC1); // clock enable
-    LL_ADC_SetClock(ADC1, LL_ADC_CLOCK_SYNC_PCLK_DIV4); // PCLK prescaler
-    LL_ADC_SetResolution(ADC1, LL_ADC_RESOLUTION_10B);        // Resolution
+    LL_ADC_SetClock(ADC1, LL_ADC_CLOCK_SYNC_PCLK_DIV1); // PCLK prescaler
+    LL_ADC_SetResolution(ADC1, LL_ADC_RESOLUTION_12B);        // Resolution
 
     LL_ADC_EnableInternalRegulator(ADC1);
     LL_ADC_SetSamplingTimeCommonChannels(ADC1, LL_ADC_SAMPLINGTIME_3CYCLES_5);

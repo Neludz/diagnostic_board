@@ -223,10 +223,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src\main.h" />
-		<Unit filename="src\ntc_sensor.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src\ntc_sensor.h" />
 		<Unit filename="src\startup_stm32l010x4.S">
 			<Option compilerVar="CC" />
 			<Option weight="0" />

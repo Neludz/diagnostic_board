@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <EmBitz_layout_file>
-	<ActiveTarget name="Release" />
+	<ActiveTarget name="Debug" />
 	<File name="cmsis\cmsis_gcc.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="6677" topLine="184" />
+			<Cursor1 position="33968" topLine="1071" />
 		</Cursor>
 	</File>
 	<File name="cmsis\core_cm0plus.h" open="0" top="0" tabpos="36" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -81,9 +81,9 @@
 			<Cursor1 position="4275" topLine="101" />
 		</Cursor>
 	</File>
-	<File name="LL\Src\stm32l0xx_ll_adc.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="LL\Src\stm32l0xx_ll_adc.c" open="1" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="16008" topLine="323" />
+			<Cursor1 position="3088" topLine="46" />
 		</Cursor>
 	</File>
 	<File name="LL\Src\stm32l0xx_ll_gpio.c" open="0" top="0" tabpos="47" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -108,12 +108,12 @@
 	</File>
 	<File name="src\clock_l0xx.c" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2356" topLine="57" />
+			<Cursor1 position="2356" topLine="87" />
 		</Cursor>
 	</File>
 	<File name="src\clock_l0xx.h" open="0" top="0" tabpos="31" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="574" topLine="0" />
+			<Cursor1 position="292" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="src\ebmon.c" open="0" top="0" tabpos="33" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -126,34 +126,24 @@
 			<Cursor1 position="0" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src\IO_stm32l0xx.c" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
+	<File name="src\IO_stm32l0xx.c" open="1" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="683" topLine="3" />
+			<Cursor1 position="4183" topLine="110" />
 		</Cursor>
 	</File>
-	<File name="src\IO_stm32l0xx.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\IO_stm32l0xx.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1679" topLine="62" />
+			<Cursor1 position="2284" topLine="45" />
 		</Cursor>
 	</File>
-	<File name="src\main.c" open="1" top="1" tabpos="6" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
+	<File name="src\main.c" open="1" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="14927" topLine="424" />
+			<Cursor1 position="17027" topLine="452" />
 		</Cursor>
 	</File>
-	<File name="src\main.h" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\main.h" open="1" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1509" topLine="16" />
-		</Cursor>
-	</File>
-	<File name="src\ntc_sensor.c" open="0" top="0" tabpos="35" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1008" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="src\ntc_sensor.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="92" topLine="0" />
+			<Cursor1 position="1209" topLine="14" />
 		</Cursor>
 	</File>
 	<File name="src\startup_stm32l010x4.S" open="0" top="0" tabpos="29" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">

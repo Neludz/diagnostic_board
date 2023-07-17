@@ -64,7 +64,7 @@ typedef enum
 #define	ADC_V_HI_CHANNEL        6
 #define ADC_NUMBER_LIST        {ADC_TEMP_CHANNEL, ADC_V_MID_CHANNEL, ADC_V_HI_CHANNEL}
 #define MV_ADC  				3300
-#define ADC_COUNTS  			(1<<10)
+#define ADC_COUNTS  			(1<<12)
 #define MODE_LEGACY             0   //0 or 1
 #define BAUDRATE                38400
 
