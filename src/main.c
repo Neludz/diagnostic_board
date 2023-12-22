@@ -393,14 +393,14 @@ void uart_processing(void)
     }
 }
 //-------------------------------------------------------------------------
-void print()
+void print(void)
 {
     if (Timer_Is_Expired(print_delay))
     {
         print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(2000));
-        printf("adc_average_v_hi = %d \n", adc_average_v_hi);
-        printf("adc_average_v_mid = %d \n", adc_average_v_mid);
-        printf("adc_filtered[ADC_TEMP_NUM] = %d \n", adc_filtered[ADC_TEMP_NUM]);
+        //printf("adc_average_v_hi = %d \n", adc_average_v_hi);
+        //printf("adc_average_v_mid = %d \n", adc_average_v_mid);
+        //printf("adc_filtered[ADC_TEMP_NUM] = %d \n", adc_filtered[ADC_TEMP_NUM]);
         printf("COUNT____ = %d \n", print1);
     }
 }
@@ -497,11 +497,11 @@ int main(void)
     address = IO_GetLineActive(io_addr0) | IO_GetLineActive(io_addr1) << 1 | IO_GetLineActive(io_addr2) << 2 | IO_GetLineActive(io_addr3) << 3;
     mode = IO_GetLineActive(io_mode);
     IO_UARTC_Init(mode);
-    IO_DeConfigLine(io_addr0);
-    IO_DeConfigLine(io_addr1);
-    IO_DeConfigLine(io_addr2);
-    IO_DeConfigLine(io_addr3);
-    IO_DeConfigLine(io_mode);
+//    IO_DeConfigLine(io_addr0);
+//    IO_DeConfigLine(io_addr1);
+//    IO_DeConfigLine(io_addr2);
+//    IO_DeConfigLine(io_addr3);
+//    IO_DeConfigLine(io_mode);
 #ifdef DEBU_USER
     printf ( "[ INFO ] Program start now\n" );
 #endif

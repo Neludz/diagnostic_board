@@ -7,21 +7,12 @@
 #include "main.h"
 
 // Config
-#ifndef PREFETCH_ENABLE
-#define  PREFETCH_ENABLE
-#endif
-#ifndef PREREAD_ENABLE
-#define  PREREAD_ENABLE
-#endif
-#ifndef BUFFER_CACHE_DISABLE
-//#define  BUFFER_CACHE_DISABLE
-#endif
 
 #ifndef POWER_VOLTAGE
 #define POWER_VOLTAGE   LL_PWR_REGU_VOLTAGE_SCALE1
 #endif
 
-#if !defined(USE_HSE_BYPASS) && !defined(USE_HSE) && !defined(USE_HSI_4)
+#if !defined(USE_HSE_BYPASS) && !defined(USE_HSE) && !defined(USE_HSI_4) && !defined(USE_HSI)
 #define USE_HSE_BYPASS
 #endif
 
@@ -43,6 +34,10 @@
 
 #if defined(USE_HSE_BYPASS) && defined(USE_HSE)
 #error HSE or HSE_BYPASS!!! Check this!
+#endif
+
+#if defined(USE_HSI) && defined(USE_HSI_4)
+#error HSI or HSI/4!!! Check this!
 #endif
 
 void ClockInit(void)
@@ -69,27 +64,38 @@ void ClockInit(void)
 #if defined USE_HSE_BYPASS
     LL_RCC_HSE_EnableBypass();
     LL_RCC_HSE_Enable();
-        while(!LL_RCC_HSE_IsReady ())
+    while(!LL_RCC_HSE_IsReady ())
     {
         // Wait HSE
     }
 #elif defined USE_HSE
     LL_RCC_HSE_Enable();
-        while(!LL_RCC_HSE_IsReady ())
+    while(!LL_RCC_HSE_IsReady ())
     {
         // Wait HSE
     }
 #elif defined USE_HSI_4
     LL_RCC_HSI_EnableDivider();
     LL_RCC_HSI_Enable();
-        while(!LL_RCC_HSI_IsReady ())
+    while(!LL_RCC_HSI_IsReady ())
     {
-        // Wait HSE
+        // Wait
+    }
+#elif defined USE_HSI
+    LL_RCC_HSI_Enable();
+    while(!LL_RCC_HSI_IsReady ())
+    {
+        // Wait
     }
 #endif
 
 #ifdef USE_PLL
+
+#if defined(USE_HSE_BYPASS) || defined(USE_HSE)
     LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, PLL_MUL, PLL_DIV);
+#else
+    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, PLL_MUL, PLL_DIV);
+#endif
     LL_RCC_PLL_Enable();
     while(!LL_RCC_PLL_IsReady())
     {
@@ -110,15 +116,15 @@ void ClockInit(void)
     {
         // Wait ClkSource
     }
-#elif defined USE_HSI_4
-    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI);
-    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI)
+#elif defined(USE_HSE_BYPASS) || defined(USE_HSE)
+    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSE);
+    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSE)
     {
         // Wait ClkSource
     }
 #else
-    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSE);
-    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSE)
+    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI);
+    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI)
     {
         // Wait ClkSource
     }

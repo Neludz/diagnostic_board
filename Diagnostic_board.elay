@@ -6,14 +6,14 @@
 			<Cursor1 position="33968" topLine="1071" />
 		</Cursor>
 	</File>
-	<File name="cmsis\core_cm0plus.h" open="0" top="0" tabpos="36" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="cmsis\core_cm0plus.h" open="0" top="0" tabpos="25" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="49660" topLine="1043" />
+			<Cursor1 position="49815" topLine="1043" />
 		</Cursor>
 	</File>
-	<File name="inc\stm32l010x4.h" open="0" top="0" tabpos="34" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="inc\stm32l010x4.h" open="0" top="0" tabpos="47" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="72508" topLine="1058" />
+			<Cursor1 position="126530" topLine="1737" />
 		</Cursor>
 	</File>
 	<File name="inc\stm32l0xx.h" open="0" top="0" tabpos="39" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -51,19 +51,19 @@
 			<Cursor1 position="61636" topLine="1629" />
 		</Cursor>
 	</File>
-	<File name="LL\Inc\stm32l0xx_ll_pwr.h" open="0" top="0" tabpos="42" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="LL\Inc\stm32l0xx_ll_pwr.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="11484" topLine="278" />
+			<Cursor1 position="10352" topLine="250" />
 		</Cursor>
 	</File>
-	<File name="LL\Inc\stm32l0xx_ll_rcc.h" open="0" top="0" tabpos="44" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="LL\Inc\stm32l0xx_ll_rcc.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="52622" topLine="1475" />
+			<Cursor1 position="45135" topLine="1255" />
 		</Cursor>
 	</File>
-	<File name="LL\Inc\stm32l0xx_ll_system.h" open="0" top="0" tabpos="41" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="LL\Inc\stm32l0xx_ll_system.h" open="0" top="0" tabpos="46" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="15246" topLine="316" />
+			<Cursor1 position="38630" topLine="920" />
 		</Cursor>
 	</File>
 	<File name="LL\Inc\stm32l0xx_ll_usart.h" open="0" top="0" tabpos="30" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -81,7 +81,7 @@
 			<Cursor1 position="4275" topLine="101" />
 		</Cursor>
 	</File>
-	<File name="LL\Src\stm32l0xx_ll_adc.c" open="1" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="LL\Src\stm32l0xx_ll_adc.c" open="0" top="0" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="3088" topLine="46" />
 		</Cursor>
@@ -106,49 +106,49 @@
 			<Cursor1 position="4637" topLine="353" />
 		</Cursor>
 	</File>
-	<File name="src\clock_l0xx.c" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\clock_l0xx.c" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2356" topLine="87" />
+			<Cursor1 position="1880" topLine="87" />
 		</Cursor>
 	</File>
-	<File name="src\clock_l0xx.h" open="0" top="0" tabpos="31" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\clock_l0xx.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="292" topLine="0" />
+			<Cursor1 position="205" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src\ebmon.c" open="0" top="0" tabpos="33" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\ebmon.c" open="0" top="0" tabpos="45" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="2976" topLine="97" />
 		</Cursor>
 	</File>
-	<File name="src\ebmon.h" open="0" top="0" tabpos="43" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\ebmon.h" open="0" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="0" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src\IO_stm32l0xx.c" open="1" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
+	<File name="src\IO_stm32l0xx.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4183" topLine="110" />
+			<Cursor1 position="4644" topLine="119" />
 		</Cursor>
 	</File>
-	<File name="src\IO_stm32l0xx.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\IO_stm32l0xx.h" open="0" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2284" topLine="45" />
+			<Cursor1 position="1722" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src\main.c" open="1" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\main.c" open="1" top="1" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="17027" topLine="452" />
+			<Cursor1 position="17053" topLine="471" />
 		</Cursor>
 	</File>
-	<File name="src\main.h" open="1" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\main.h" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1209" topLine="14" />
+			<Cursor1 position="962" topLine="3" />
 		</Cursor>
 	</File>
-	<File name="src\startup_stm32l010x4.S" open="0" top="0" tabpos="29" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\startup_stm32l010x4.S" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3119" topLine="58" />
+			<Cursor1 position="4809" topLine="120" />
 		</Cursor>
 	</File>
 	<File name="src\system_stm32l0xx.c" open="0" top="0" tabpos="46" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
