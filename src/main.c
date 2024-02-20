@@ -12,12 +12,12 @@ int32_t adc_value_temper = 0;
 extern uint16_t adc_data[];
 int32_t adc_filtered[ADC_NUMBER];
 uint16_t uart_buffer[16];
-volatile uint32_t  adc_busy = 0, adc_iteration_count = 0, adc_threshold_start = 0, adc_sleep = 0;
+volatile uint32_t  adc_busy = 0, adc_iteration_count = 0, adc_threshold_start = 0;
 uint32_t v_wait_threshold = 0;
 uint32_t address = 0, mode = 0;
 volatile uint32_t Tick=0;
-uint32_t adc_delay, uart_delay, print_delay;
-uint32_t tx_count = 0, tx_index, test, uart_busy = 0;
+uint32_t adc_delay = 0, uart_delay = 0, print_delay = 0;
+uint32_t tx_count = 0, tx_index, uart_busy = 0;
 int32_t temp_temp;
 uint32_t print1;
 const unsigned char crc_array[256] =
@@ -116,7 +116,7 @@ void data_update(void)
     if (mode == MODE_LEGACY)
     {
         temp_temp = (((int32_t)(((R_TEMPER_DIVIDER * adc_filtered[ADC_TEMP_NUM])/(ADC_COUNTS - adc_filtered[ADC_TEMP_NUM])) - R_TEMPER_LEGACY_R0)*\
-                      (100000/R_TEMPER_LEGACY_R0)+ (K_TEMPER_A_INVERSE_X100>>1))/K_TEMPER_A_INVERSE_X100);
+                      (100000/R_TEMPER_LEGACY_R0) + (K_TEMPER_A_INVERSE_X100>>1))/K_TEMPER_A_INVERSE_X100);
     }
     else
     {
@@ -479,7 +479,10 @@ int main(void)
     uint32_t i;
     ClockInit();
     SysTick_Config(SYSCLK_FREQ/SYSTIMER_TICK);
+#ifndef DEBU_USER
     iwdg_init(IWDG_TIME_X_0_1S);
+#endif
+
     print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(400));
     while (!Timer_Is_Expired(print_delay))
     {
@@ -505,7 +508,6 @@ int main(void)
 #ifdef DEBU_USER
     printf ( "[ INFO ] Program start now\n" );
 #endif
-
     for (i =0; i<ADC_NUMBER; i++)
     {
         adc_filtered[i] = 0;

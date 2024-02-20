@@ -139,17 +139,18 @@ static void IO_ADC_Init(void)
 
 void IO_UARTC_Init(uint32_t mode)
 {
-
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_LPUART1);
-    LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_9B);
+
+        if (mode == MODE_LEGACY)
+        LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_8B);
+    else
+        LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_9B);
+
     LL_LPUART_SetStopBitsLength(LPUART1, LL_USART_STOPBITS_1);
     LL_LPUART_SetBaudRate(LPUART1, (SYSCLK_FREQ), BAUDRATE);
     LL_LPUART_EnableDirectionTx(LPUART1);
-
     //LL_LPUART_EnableDMAReq_TX(LPUART1);
-
     LL_LPUART_EnableIT_TC(LPUART1);
-
     LL_LPUART_Enable(LPUART1);
     NVIC_SetPriority(LPUART1_IRQn, 1);
     NVIC_EnableIRQ(LPUART1_IRQn);
