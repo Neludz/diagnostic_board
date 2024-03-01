@@ -4,22 +4,37 @@
 #include <stm32l0xx_ll_adc.h>
 #include <stdio.h>
 #include <string.h>
+#include "TableSensor.h"
 
 //-------------------------------------------------------------------------
-uint32_t  adc_value_v_mid = 0, adc_value_v_hi = 0;
 uint32_t adc_average_v_mid = 0, adc_average_v_hi = 0;
 int32_t adc_value_temper = 0;
 extern uint16_t adc_data[];
 int32_t adc_filtered[ADC_NUMBER];
 uint16_t uart_buffer[16];
 volatile uint32_t  adc_busy = 0, adc_iteration_count = 0, adc_threshold_start = 0;
-uint32_t v_wait_threshold = 0;
 uint32_t address = 0, mode = 0;
 volatile uint32_t Tick=0;
-uint32_t adc_delay = 0, uart_delay = 0, print_delay = 0;
+uint32_t adc_delay = 0, uart_delay = 0, print_delay = 0, data_update_delay;
 uint32_t tx_count = 0, tx_index, uart_busy = 0;
-int32_t temp_temp;
-uint32_t print1;
+
+//TD4A
+TABLE_SENSOR_DEF(td4a,
+                 TEMPER_MIN_TABLE,
+                 TEMPER_MAX_TABLE,
+                 TEMPER_STEP_TABLE,
+                 TEMPER_WHEN_UNDER,
+                 TEMPER_WHEN_OVER,
+                 TEMPER_TD4A_TABLE);
+//Pt1000
+TABLE_SENSOR_DEF(pt1000,
+                 TEMPER_MIN_TABLE,
+                 TEMPER_MAX_TABLE,
+                 TEMPER_STEP_TABLE,
+                 TEMPER_WHEN_UNDER,
+                 TEMPER_WHEN_OVER,
+                 TEMPER_PT1000_TABLE);
+
 const unsigned char crc_array[256] =
 {
     0x00, 0x5e, 0xbc, 0xe2, 0x61, 0x3f, 0xdd, 0x83,
@@ -113,25 +128,15 @@ uint32_t Main_Timer_Set(const uint32_t AddTime)
 //-------------------------------------------------------------------------
 void data_update(void)
 {
-    if (mode == MODE_LEGACY)
+    if (Timer_Is_Expired(data_update_delay))
     {
-        temp_temp = (((int32_t)(((R_TEMPER_DIVIDER * adc_filtered[ADC_TEMP_NUM])/(ADC_COUNTS - adc_filtered[ADC_TEMP_NUM])) - R_TEMPER_LEGACY_R0)*\
-                      (100000/R_TEMPER_LEGACY_R0) + (K_TEMPER_A_INVERSE_X100>>1))/K_TEMPER_A_INVERSE_X100);
+        data_update_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(DATA_UPDATE_MS));
+        if (mode == MODE_LEGACY)
+            adc_value_temper = calc_temperature_ptc(td4a, adc_filtered[ADC_TEMP_NUM]);
+        else
+            adc_value_temper = calc_temperature_ptc(pt1000, adc_filtered[ADC_TEMP_NUM]);
+        LL_IWDG_ReloadCounter(IWDG);
     }
-    else
-    {
-        temp_temp = (((int32_t)(((R_TEMPER_DIVIDER * adc_filtered[ADC_TEMP_NUM])/(ADC_COUNTS- adc_filtered[ADC_TEMP_NUM])) - R_TEMPER_MODERN_R0)*\
-                      (100000/R_TEMPER_MODERN_R0) + (K_TEMPER_A_INVERSE_X100>>1))/K_TEMPER_A_INVERSE_X100);
-
-        adc_value_v_mid = (adc_average_v_mid * K_VOLT_MV + 500)/1000; //((adc_value_v_mid * 63) + (adc_average_v_mid * K_VOLT_MV/1000)) >> 6; //
-        adc_value_v_hi =  (adc_average_v_hi * K_VOLT_MV + 500)/1000; //((adc_value_v_hi * 63) + (adc_average_v_hi * K_VOLT_MV/1000)) >> 6; //
-    }
-    if (temp_temp >= TEMPERATURE_MAX || temp_temp <= TEMPERATURE_MIN)
-        adc_value_temper = TEMPERATURE_MAX;
-    else
-        adc_value_temper = (adc_value_temper * 3 + temp_temp) >> 2;
-
-    LL_IWDG_ReloadCounter(IWDG);
 }
 //-------------------------------------------------------------------------
 void adc_processing(void)
@@ -200,10 +205,8 @@ void adc_processing(void)
         adc_average_v_hi = (adc_average_v_hi * 3 + (value_temp_hi / adc_iteration_count)) >> 2;//(adc_sum_v_hi / adc_iteration_count);//
         // v_mid
         adc_average_v_mid = (adc_average_v_mid * 3 + (value_temp_mid / adc_iteration_count)) >> 2;// (adc_sum_v_mid / adc_iteration_count);
-        data_update();
         adc_sum_v_hi = 0;
         adc_sum_v_mid = 0;
-        print1 = adc_iteration_count;
         adc_iteration_count = 0;
         if (adc_threshold_start)
         {
@@ -215,7 +218,7 @@ void adc_processing(void)
         }
         else
         {
-            adc_delay = Main_Timer_Set(ADC_DELAY_MODERN_MS);
+            adc_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(ADC_DELAY_MODERN_MS));
             LL_ADC_DisableInternalRegulator(ADC1);
             LL_ADC_Disable(ADC1);
             adc_state = 3;
@@ -251,20 +254,20 @@ uint32_t fill_buffer_legacy()
     if (!adc_average_v_hi)
         adc_average_v_hi++;
     delta = ((adc_average_v_mid * 0xFF)+(adc_average_v_hi>>1)) / adc_average_v_hi;
-    //delta = delta >> 4; // 8bit
+
     if (delta >= 0xFF)
         delta = 0xFE;
 
     uart_buffer[1] = (delta >> 3) | 1;
     uart_buffer[2] = ((delta & 0xF) << 1) | 1;
     //temperature
-    if (adc_value_temper >= TEMPERATURE_MAX || (int32_t)adc_value_temper <= (int32_t)TEMPERATURE_MIN)
+    if (adc_value_temper >= TEMPERATURE_MAX)
     {
         uart_buffer[3] = 110;
     }
     else
     {
-        span = ((adc_value_temper - (TEMPERATURE_MIN))*100 + (TEMPERATURE_SPAN >> 1))/TEMPERATURE_SPAN;
+        span = (adc_value_temper+60)/2;
         uart_buffer[3] = span;
     }
     // CRC
@@ -295,22 +298,23 @@ uint32_t fill_buffer_modern()
     // addr
     uart_buffer[0] = address << 4;
     // delta
-    if (adc_value_v_mid > (1<<12))
+    if (adc_average_v_mid > (1<<12))
         delta = (0xFFF);
     else
-        delta = adc_value_v_mid;
+        delta = adc_average_v_mid>>1;
     uart_buffer[1] = (((delta >> 7) & 0x7F) << 1) | 0x01;
     uart_buffer[2] = ((delta & 0x7F) << 1) | 0x01;
 
-    if (adc_value_v_hi > adc_value_v_mid && adc_value_v_hi < (1<<12))
-        delta = adc_value_v_hi - adc_value_v_mid;
+    if (adc_average_v_hi > adc_average_v_mid && adc_average_v_hi < (1<<12))
+        delta = (adc_average_v_hi - adc_average_v_mid)>>1;
     else
         delta = 0;
+
     uart_buffer[3] = (((delta >> 7) & 0x7F) << 1) | 0x01;
     uart_buffer[4] = ((delta & 0x7F) << 1) | 0x01;
 
     // temperature
-    if (adc_value_temper >= TEMPERATURE_MAX || adc_value_temper <= TEMPERATURE_MIN)
+    if (adc_value_temper >= TEMPERATURE_MAX)
     {
         temperature = 224;
         uart_buffer[0] |= (0x01 << 3);
@@ -397,11 +401,9 @@ void print(void)
 {
     if (Timer_Is_Expired(print_delay))
     {
-        print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(2000));
-        //printf("adc_average_v_hi = %d \n", adc_average_v_hi);
-        //printf("adc_average_v_mid = %d \n", adc_average_v_mid);
-        //printf("adc_filtered[ADC_TEMP_NUM] = %d \n", adc_filtered[ADC_TEMP_NUM]);
-        printf("COUNT____ = %d \n", print1);
+        print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(500));
+        printf("[INFO] \n");
+         printf("adc_value_temper=%d\n",adc_value_temper);
     }
 }
 //-------------------------------------------------------------------------
@@ -450,15 +452,6 @@ void flash_btock(void)
 //----------
         SET_BIT(FLASH->PECR, FLASH_PECR_OPTLOCK);
     }
-}
-//-------------------------------------------------------------------------
-void wd_init(void)
-{
-    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_WWDG);
-    LL_WWDG_SetPrescaler(WWDG, LL_WWDG_PRESCALER_1);
-    LL_WWDG_SetCounter(WWDG, WWDG_COUNTER);
-    LL_WWDG_SetWindow(WWDG, WWDG_COUNTER);
-    LL_WWDG_Enable(WWDG);
 }
 //-------------------------------------------------------------------------
 void iwdg_init(uint8_t x0_1s_time)
@@ -513,8 +506,8 @@ int main(void)
         adc_filtered[i] = 0;
         adc_data[i] = 0;
     }
-    uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(100));
-
+    uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(200));
+    data_update_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(150));
     while(1)
     {
 #ifdef DEBU_USER
@@ -524,6 +517,7 @@ int main(void)
         __WFE();
         uart_processing();
         adc_processing();
+        data_update();
     }
 }
 //-------------------------------------------------------------------------

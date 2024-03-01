@@ -19,7 +19,6 @@ extern "C" {
 #define BOR_LEVEL       BOR_LEVEL2
 #define RDP_VAL         0xBB
 
-#define WWDG_COUNTER    0x7F
 #define IWDG_TIME_X_0_1S    200 // 20s
 
 #define ADC_TIME_MS             20
@@ -32,24 +31,33 @@ extern "C" {
 #define SYSTIMER_MS_TO_TICK(x)  ((SYSTIMER_TICK * x) / 1000)
 #define ADC_TIME                SYSTIMER_MS_TO_TICK(ADC_TIME_MS)
 
-#define R_LOW_DEV_OHM_ADC 		200
-#define R_HIGH_DEV_OHM_ADC 		70500
-//#define K_SHEME_X100            141
-#define K_VOLT_MV               ((MV_ADC * (R_LOW_DEV_OHM_ADC + R_HIGH_DEV_OHM_ADC)+((R_LOW_DEV_OHM_ADC * ADC_COUNTS)>>1))/(R_LOW_DEV_OHM_ADC * ADC_COUNTS))
+#define DATA_UPDATE_MS          500
+
 #define K_FILTER_VOLT           15     //1..255
 #define K_FILTER_B_VOLT         20     //1..255
 #define K_FILTER_D_VOLT         50     //1..255
-#define K_FILTER_TEMPERATURE    1      //1..255
+#define K_FILTER_TEMPERATURE    15     //1..255
 #define THRESHOLD_LOW_DIGIT     32
 #define THRESHOLD_HI_DIGIT      120
 
-#define R_TEMPER_DIVIDER        5100
-#define R_TEMPER_LEGACY_R0      1854
-#define R_TEMPER_MODERN_R0      1000
-#define K_TEMPER_A_INVERSE_X100 394
-#define TEMPERATURE_MAX         140
-#define TEMPERATURE_MIN         -40
-#define TEMPERATURE_SPAN        181
+// t = A * D_Rt + B
+#define TEMPERATURE_MAX             150
+#define TEMPERATURE_MIN             -50
+#define K_TEMPER_LEGACY_A_X1000     324
+#define K_TEMPER_LEGACY_B           (-354)
+#define K_TEMPER_PT1000_A_X1000     503
+#define K_TEMPER_PT1000_B           (-339)
+// table
+#define TEMPER_MAX_TABLE            TEMPERATURE_MAX
+#define TEMPER_MIN_TABLE            TEMPERATURE_MIN
+#define TEMPER_STEP_TABLE           10
+#define TEMPER_WHEN_UNDER           (TEMPERATURE_MAX)
+#define TEMPER_WHEN_OVER            (TEMPERATURE_MAX)
+#define TEMPER_TD4A_TABLE           {941, 971, 1001, 1031, 1061, 1092, 1123, 1154, 1185, 1216, 1247, 1278, 1310, 1341, 1372, 1403, 1434, 1465, 1496, 1527, 1557}
+#define TEMPER_PT1000_TABLE         {557, 581, 604, 627, 649, 671, 693, 715, 736, 757, 777, 797, 817, 837, 856, 875, 893, 912, 930, 948, 966}
+
+
+
 
 
 #ifdef __cplusplus

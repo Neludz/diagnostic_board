@@ -233,6 +233,10 @@
 		<Unit filename="src\system_stm32l0xx.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\TableSensor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\TableSensor.h" />
 		<Unit filename="stm32l010k4_flash.ld" />
 		<Unit filename="STM32L0x0.svd" />
 		<Extensions>
