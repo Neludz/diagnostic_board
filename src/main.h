@@ -39,7 +39,6 @@ extern "C" {
 #define K_FILTER_TEMPERATURE    15     //1..255
 #define THRESHOLD_LOW_DIGIT     32
 #define THRESHOLD_HI_DIGIT      120
-#define VOLTAGE_MIN_LEVEL_DIGIT 100
 
 // t = A * D_Rt + B
 #define TEMPERATURE_MAX             150

@@ -201,14 +201,8 @@ void adc_processing(void)
         value_hi = (value_hi * 3 + (adc_sum_v_hi / adc_iteration_count)) >> 2;//(adc_sum_v_hi / adc_iteration_count);//
         // v_mid
         value_mid = (value_mid * 3 + (adc_sum_v_mid / adc_iteration_count)) >> 2;// (adc_sum_v_mid / adc_iteration_count);
-        if (value_hi > VOLTAGE_MIN_LEVEL_DIGIT)
-            adc_average_v_hi = value_hi;
-        else
-            adc_average_v_hi = 0;
-        if (value_mid > VOLTAGE_MIN_LEVEL_DIGIT)
-            adc_average_v_mid = value_mid;
-        else
-            adc_average_v_mid = 0;
+        adc_average_v_hi = value_hi;
+        adc_average_v_mid = value_mid;
         adc_sum_v_hi = 0;
         adc_sum_v_mid = 0;
         adc_iteration_count = 0;
@@ -480,7 +474,7 @@ int main(void)
     iwdg_init(IWDG_TIME_X_0_1S);
 #endif
 
-    print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(400));
+    print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(100));
     while (!Timer_Is_Expired(print_delay))
     {
         __WFI();
@@ -489,7 +483,7 @@ int main(void)
     flash_btock();
 #endif
     IO_Init();
-    print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(100));
+    print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(5));
     while (!Timer_Is_Expired(print_delay))
     {
         __WFI();
@@ -510,7 +504,8 @@ int main(void)
         adc_filtered[i] = 0;
         adc_data[i] = 0;
     }
-    uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(200));
+    uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(300));
+
     data_update_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(150));
     while(1)
     {
