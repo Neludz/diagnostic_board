@@ -128,7 +128,7 @@
 	</File>
 	<File name="src\IO_stm32l0xx.c" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="860" topLine="153" />
+			<Cursor1 position="860" topLine="149" />
 		</Cursor>
 	</File>
 	<File name="src\IO_stm32l0xx.h" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -136,12 +136,12 @@
 			<Cursor1 position="2247" topLine="57" />
 		</Cursor>
 	</File>
-	<File name="src\main.c" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\main.c" open="1" top="1" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="8068" topLine="152" />
+			<Cursor1 position="9561" topLine="290" />
 		</Cursor>
 	</File>
-	<File name="src\main.h" open="1" top="1" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\main.h" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="1591" topLine="23" />
 		</Cursor>

@@ -145,7 +145,7 @@ void adc_processing(void)
     static uint32_t intermediate_t = 0;
     static int32_t b_v_mid = 0, b_v_hi = 0;
     static int32_t adc_sum_v_mid = 0, adc_sum_v_hi = 0, adc_state = 0;
-    uint32_t value_temp_hi, value_temp_mid;
+    static uint32_t value_hi = 0, value_mid = 0;
     switch (adc_state)
     {
     case 0:
@@ -193,18 +193,22 @@ void adc_processing(void)
             break;
         }
     case 2:
-        if (adc_sum_v_hi > 0)   //if use double smoothing ADC filtering value can be < 0
-            value_temp_hi = adc_sum_v_hi;
-        else
-            value_temp_hi = 0;
-        if (adc_sum_v_mid > 0) //if use double smoothing ADC filtering value can be < 0
-            value_temp_mid = adc_sum_v_mid;
-        else
-            value_temp_mid = 0;
+        if (adc_sum_v_hi < 0)   //if use double smoothing ADC filtering value can be < 0
+            adc_sum_v_hi = 0;
+        if (adc_sum_v_mid < 0) //if use double smoothing ADC filtering value can be < 0
+            adc_sum_v_mid = 0;
         // v_hi
-        adc_average_v_hi = (adc_average_v_hi * 3 + (value_temp_hi / adc_iteration_count)) >> 2;//(adc_sum_v_hi / adc_iteration_count);//
+        value_hi = (value_hi * 3 + (adc_sum_v_hi / adc_iteration_count)) >> 2;//(adc_sum_v_hi / adc_iteration_count);//
         // v_mid
-        adc_average_v_mid = (adc_average_v_mid * 3 + (value_temp_mid / adc_iteration_count)) >> 2;// (adc_sum_v_mid / adc_iteration_count);
+        value_mid = (value_mid * 3 + (adc_sum_v_mid / adc_iteration_count)) >> 2;// (adc_sum_v_mid / adc_iteration_count);
+        if (value_hi > VOLTAGE_MIN_LEVEL_DIGIT)
+            adc_average_v_hi = value_hi;
+        else
+            adc_average_v_hi = 0;
+        if (value_mid > VOLTAGE_MIN_LEVEL_DIGIT)
+            adc_average_v_mid = value_mid;
+        else
+            adc_average_v_mid = 0;
         adc_sum_v_hi = 0;
         adc_sum_v_mid = 0;
         adc_iteration_count = 0;
@@ -403,7 +407,7 @@ void print(void)
     {
         print_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(500));
         printf("[INFO] \n");
-         printf("adc_value_temper=%d\n",adc_value_temper);
+        printf("adc_value_temper=%d\n",adc_value_temper);
     }
 }
 //-------------------------------------------------------------------------
