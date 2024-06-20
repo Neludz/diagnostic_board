@@ -133,7 +133,7 @@ void IO_ADC_Init(void)
     LL_ADC_Enable(ADC1);
 }
 
-void IO_UARTC_Init(uint32_t mode)
+void IO_UART_Init(uint32_t mode)
 {
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_LPUART1);
     LL_APB1_GRP1_EnableClockSleep(LL_APB1_GRP1_PERIPH_LPUART1);
