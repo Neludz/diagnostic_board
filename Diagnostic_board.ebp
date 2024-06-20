@@ -56,6 +56,7 @@
 					<Add option="-Os" />
 					<Add option="-g2" />
 					<Add symbol="DEBU_USER" />
+					<Add symbol="DEBUG_TARGET" />
 				</Compiler>
 				<Cpp>
 					<Add option="-fdata-sections" />
@@ -222,6 +223,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src\IO_stm32l0xx.h" />
+		<Unit filename="src\log_nel.h" />
 		<Unit filename="src\main.c">
 			<Option compilerVar="CC" />
 		</Unit>

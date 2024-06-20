@@ -8,9 +8,7 @@
 #include <stm32l0xx_ll_dma.h>
 #include <main.h>
 //------------------------------- prototype -------------------------------------
-static void IO_ADC_Init(void);
 static void IO_ConfigLine(tGPIO_Line io);
-static void IO_DMA_Init(void);
 //--------------X macros---------------------------------------------------------
 const tGPIO_Line IOs[NUM_IO] =
 {
@@ -71,8 +69,6 @@ void IO_Init(void)
     {
         IO_ConfigLine(IOs[Line]);
     }
-    IO_ADC_Init();
-    IO_DMA_Init();
 }
 
 static void IO_ConfigLine(tGPIO_Line io)
@@ -104,7 +100,7 @@ static void IO_ConfigLine(tGPIO_Line io)
     io.GPIOx->ODR |= (io.DefState << io.GPIO_Pin);
 }
 
- void IO_DeConfigLine(tIOLine Line)
+void IO_DeConfigLine(tIOLine Line)
 {
 
     IOs[Line].GPIOx->PUPDR &= ~(0x03 << (IOs[Line].GPIO_Pin * 2));
@@ -112,7 +108,7 @@ static void IO_ConfigLine(tGPIO_Line io)
 
 }
 
-static void IO_ADC_Init(void)
+void IO_ADC_Init(void)
 {
     LL_ADC_SetCommonFrequencyMode(ADC1_COMMON, LL_ADC_CLOCK_FREQ_MODE_LOW);  //if adc clock low then 3,5 MHz
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_ADC1); // clock enable
@@ -140,8 +136,8 @@ static void IO_ADC_Init(void)
 void IO_UARTC_Init(uint32_t mode)
 {
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_LPUART1);
-
-        if (mode == MODE_LEGACY)
+    LL_APB1_GRP1_EnableClockSleep(LL_APB1_GRP1_PERIPH_LPUART1);
+    if (mode == MODE_LEGACY)
         LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_8B);
     else
         LL_LPUART_SetDataWidth(LPUART1, LL_USART_DATAWIDTH_9B);
@@ -156,7 +152,7 @@ void IO_UARTC_Init(uint32_t mode)
     NVIC_EnableIRQ(LPUART1_IRQn);
 }
 
-static void IO_DMA_Init(void)
+void IO_DMA_Init(void)
 {
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
     LL_AHB1_GRP1_EnableClockSleep(LL_AHB1_GRP1_PERIPH_DMA1);
@@ -171,7 +167,7 @@ static void IO_DMA_Init(void)
     LL_DMA_SetPeriphRequest(DMA1, LL_DMA_CHANNEL_1, LL_DMA_REQUEST_0);
 
     LL_DMA_ConfigAddresses(DMA1, LL_DMA_CHANNEL_1, (uint32_t)(&(ADC1->DR)),
-                           (uint32_t)&adc_data, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+                           (uint32_t)adc_data, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
 
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, ADC_NUMBER);
     LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_1);
@@ -179,6 +175,5 @@ static void IO_DMA_Init(void)
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_1);
     NVIC_EnableIRQ(DMA1_Channel1_IRQn); /* (1) */
     NVIC_SetPriority(DMA1_Channel1_IRQn,1); /* (2) */
-
 }
 

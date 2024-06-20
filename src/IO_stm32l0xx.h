@@ -100,6 +100,8 @@ typedef enum
 } tIOLine;
 
 void IO_Init(void);
+void  IO_ADC_Init();
+void IO_DMA_Init();
 bool IO_GetLineActive(tIOLine Line);
 void IO_UARTC_Init(uint32_t mode);
 void IO_DeConfigLine(tIOLine Line);
