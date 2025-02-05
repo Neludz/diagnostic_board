@@ -89,8 +89,6 @@ enum
     X_IO(io_mid_error,      GPIOA,  9,      (IN | NO_PULL),	0,		0,  	LOW)	\
     X_IO(io_hi_error,       GPIOA,  8,      (IN | NO_PULL),	0,		0,  	LOW)	\
 
-
-
 typedef enum
 {
 #define X_IO(a,b,c,d,e,f,g)	a,
@@ -107,4 +105,3 @@ void IO_UART_Init(uint32_t mode);
 void IO_DeConfigLine(tIOLine Line);
 
 #endif /* _IO_H */
-

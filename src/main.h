@@ -9,17 +9,17 @@ extern "C" {
 #include "stm32l0xx_ll_conf.h"
 #include <IO_stm32l0xx.h>
 
-#define BOR_OFF         ((uint8_t)0x00) /*!< BOR is disabled at power down, the reset is asserted when the VDD
+#define BOR_OFF                 ((uint8_t)0x00) /*!< BOR is disabled at power down, the reset is asserted when the VDD
                                              power supply reaches the PDR(Power Down Reset) threshold (1.5V) */
-#define BOR_LEVEL1      ((uint8_t)0x08) /*!< BOR Reset threshold levels for 1.7V - 1.8V VDD power supply    */
-#define BOR_LEVEL2      ((uint8_t)0x09) /*!< BOR Reset threshold levels for 1.9V - 2.0V VDD power supply    */
-#define BOR_LEVEL3      ((uint8_t)0x0A) /*!< BOR Reset threshold levels for 2.3V - 2.4V VDD power supply    */
-#define BOR_LEVEL4      ((uint8_t)0x0B) /*!< BOR Reset threshold levels for 2.55V - 2.65V VDD power supply  */
-#define BOR_LEVEL5      ((uint8_t)0x0C)
-#define BOR_LEVEL       BOR_LEVEL2
-#define RDP_VAL         0xBB
+#define BOR_LEVEL1              ((uint8_t)0x08) /*!< BOR Reset threshold levels for 1.7V - 1.8V VDD power supply    */
+#define BOR_LEVEL2              ((uint8_t)0x09) /*!< BOR Reset threshold levels for 1.9V - 2.0V VDD power supply    */
+#define BOR_LEVEL3              ((uint8_t)0x0A) /*!< BOR Reset threshold levels for 2.3V - 2.4V VDD power supply    */
+#define BOR_LEVEL4              ((uint8_t)0x0B) /*!< BOR Reset threshold levels for 2.55V - 2.65V VDD power supply  */
+#define BOR_LEVEL5              ((uint8_t)0x0C)
+#define BOR_LEVEL               BOR_LEVEL2
+#define RDP_VAL                 0xBB
 
-#define IWDG_TIME_X_0_1S    200 // 20s
+#define IWDG_TIME_X_0_1S        200 // 20s
 
 #define ADC_TIME_MS             20
 //#define ADC_DELAY_LEGACY_MS     30
