@@ -226,10 +226,7 @@
 
 1718633625 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\clock_l0xx.h
 
-1718810379 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.h
-	"clock_l0xx.h"
-	"stm32l0xx_ll_conf.h"
-	<IO_stm32l0xx.h>
+1745492645 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.h
 
 1684503929 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\ll\inc\stm32l0xx_ll_conf.h
 	"stm32l0xx.h"
@@ -271,7 +268,7 @@
 	<stdint.h>
 	<stdio.h>
 
-1718886665 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\io_stm32l0xx.c
+1742203930 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\io_stm32l0xx.c
 	<stdint.h>
 	<stdbool.h>
 	<IO_stm32l0xx.h>
@@ -279,20 +276,24 @@
 	<stm32l0xx_ll_adc.h>
 	<stm32l0xx_ll_lpuart.h>
 	<stm32l0xx_ll_dma.h>
+	"clock_l0xx.h"
 	<main.h>
 
-1718886637 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\io_stm32l0xx.h
+1753282249 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\io_stm32l0xx.h
 	<stdint.h>
 	<stdbool.h>
+	"stm32l0xx_ll_conf.h"
 	"stm32l0xx.h"
 
-1718886637 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.c
+1753282156 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\main.c
 	"main.h"
+	"stm32l0xx_ll_conf.h"
 	"stm32l0xx.h"
 	<IO_stm32l0xx.h>
 	<stm32l0xx_ll_adc.h>
 	<stdio.h>
 	<string.h>
+	"clock_l0xx.h"
 	"TableSensor.h"
 	"log_nel.h"
 
@@ -307,10 +308,10 @@
 1684501556 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\system_stm32l0xx.c
 	"stm32l0xx.h"
 
-1709216659 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\tablesensor.c
+1709215796 source:d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\tablesensor.c
 	"TableSensor.h"
 
-1716906698 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\tablesensor.h
+1709216867 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\tablesensor.h
 	<stdint.h>
 
 1718294703 d:\dropbox\gg\rectifier\code\diagnostic_board_embitz\src\log_nel.h

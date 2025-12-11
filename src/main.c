@@ -1,25 +1,26 @@
 #include "main.h"
+#include "stm32l0xx_ll_conf.h"
 #include "stm32l0xx.h"
 #include <IO_stm32l0xx.h>
 #include <stm32l0xx_ll_adc.h>
 #include <stdio.h>
 #include <string.h>
+#include "clock_l0xx.h"
 #include "TableSensor.h"
 
 #define LOG_MODULE  main
 #include "log_nel.h"
-
 //-------------------------------------------------------------------------
 uint32_t adc_average_v_mid = 0, adc_average_v_hi = 0;
 int32_t adc_value_temper = 0;
 extern uint16_t adc_data[];
 int32_t adc_filtered[ADC_NUMBER];
 uint16_t uart_buffer[16];
-volatile uint32_t  adc_busy = 0, adc_iteration_count = 0, adc_threshold_start = 0;
+volatile uint32_t  adc_busy_flag = 0, adc_iteration_count = 0, adc_threshold_start_flag = 0;
 uint32_t address = 0, mode = 0;
 volatile uint32_t Tick=0;
 uint32_t adc_delay = 0, uart_delay = 0, print_delay = 0, data_update_delay;
-uint32_t tx_count = 0, tx_index, uart_busy = 0;
+uint32_t tx_count = 0, tx_index, uart_busy_flag = 0;
 #ifdef DEBUG_TARGET
 uint32_t count_test = 0;
 #endif
@@ -47,7 +48,7 @@ void DMA1_Channel1_IRQHandler()
 {
     if (LL_DMA_IsActiveFlag_TC1(DMA1) || LL_DMA_IsActiveFlag_TE1(DMA1))
     {
-        adc_busy = 0;
+        adc_busy_flag = 0;
         adc_iteration_count++;
         WRITE_REG(DMA1->IFCR, DMA_IFCR_CTEIF1 | DMA_IFCR_CTCIF1);
     }
@@ -80,7 +81,7 @@ void LPUART1_IRQHandler()
     if(LL_LPUART_IsActiveFlag_TC(LPUART1))
     {
         LL_LPUART_ClearFlag_TC(LPUART1);
-        uart_busy = 0;
+        uart_busy_flag = 0;
     }
 }
 //-------------------------------------------------------------------------
@@ -121,7 +122,7 @@ void adc_processing(void)
     switch (adc_state)
     {
     case 0:
-        if(!adc_busy)
+        if(!adc_busy_flag)
             adc_state = 1;  //fall
         else
             break;
@@ -160,7 +161,7 @@ void adc_processing(void)
         else
         {
             adc_state = 0;
-            adc_busy = 1;
+            adc_busy_flag = 1;
             LL_ADC_REG_StartConversion(ADC1);
             break;
         }
@@ -182,17 +183,17 @@ void adc_processing(void)
 #endif
 
         adc_iteration_count = 0;
-        if (adc_threshold_start)
+        if (adc_threshold_start_flag)
         {
-            adc_threshold_start = 0;
+            adc_threshold_start_flag = 0;
             adc_delay = Main_Timer_Set(ADC_TIME);
             adc_state = 0;
-            adc_busy = 1;
+            adc_busy_flag = 1;
             LL_ADC_REG_StartConversion(ADC1);
         }
         else
         {
-            adc_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(ADC_DELAY_MODERN_MS));
+            adc_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(ADC_DELAY_MS));
             LL_ADC_DisableInternalRegulator(ADC1);
             LL_ADC_Disable(ADC1);
             adc_state = 3;
@@ -201,14 +202,14 @@ void adc_processing(void)
         }
         break;
     case 3:
-        if (adc_threshold_start == 1 || Timer_Is_Expired(adc_delay))
+        if (adc_threshold_start_flag == 1 || Timer_Is_Expired(adc_delay))
         {
             adc_delay = Main_Timer_Set(ADC_TIME);
             adc_state = 0;
-            adc_threshold_start = 0;
+            adc_threshold_start_flag = 0;
             LL_ADC_EnableInternalRegulator(ADC1);
             LL_ADC_Enable(ADC1);
-            adc_busy = 1;
+            adc_busy_flag = 1;
             LL_ADC_REG_StartConversion(ADC1);
         }
         break;
@@ -256,15 +257,15 @@ uint32_t fill_buffer_modern()
     // addr
     uart_buffer[0] = address << 4;
     // delta
-    if (adc_average_v_mid > (1<<12))
-        delta = (0xFFF);
+    if (adc_average_v_mid >= (ADC_COUNTS))
+        delta = (ADC_COUNTS - 1);
     else
-        delta = adc_average_v_mid>>1;
+        delta = adc_average_v_mid;
     uart_buffer[1] = (((delta >> 7) & 0x7F) << 1) | 0x01;
     uart_buffer[2] = ((delta & 0x7F) << 1) | 0x01;
 
-    if (adc_average_v_hi > adc_average_v_mid && adc_average_v_hi < (1<<12))
-        delta = (adc_average_v_hi - adc_average_v_mid)>>1;
+    if (adc_average_v_hi > adc_average_v_mid && adc_average_v_hi < (ADC_COUNTS))
+        delta = (adc_average_v_hi - adc_average_v_mid);
     else
         delta = 0;
     uart_buffer[3] = (((delta >> 7) & 0x7F) << 1) | 0x01;
@@ -315,7 +316,7 @@ void uart_processing(void)
     case 1:
         if (mode == MODE_LEGACY)
         {
-            adc_threshold_start = 1;
+            adc_threshold_start_flag = 1;
             uart_state = 2;     //fall
         }
         else
@@ -328,11 +329,11 @@ void uart_processing(void)
         {
             uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(UART_TIME_LEGASY_MS));
             uart_state = 0;
-            if(uart_busy == 0)
+            if(uart_busy_flag == 0)
             {
                 tx_count = fill_buffer_legacy();
                 tx_index = 0;
-                uart_busy = 1;
+                uart_busy_flag = 1;
                 LL_LPUART_EnableIT_TXE(LPUART1);
             }
         }
@@ -340,11 +341,11 @@ void uart_processing(void)
     case 3: //modern
         uart_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(UART_TIME_MODERN_MS));
         uart_state = 0;
-        if(uart_busy == 0)
+        if(uart_busy_flag == 0)
         {
             tx_count = fill_buffer_modern();
             tx_index = 0;
-            uart_busy = 1;
+            uart_busy_flag = 1;
             LL_LPUART_EnableIT_TXE(LPUART1);
         }
         break;
@@ -361,66 +362,7 @@ void print(void)
         LOG_INFO ("count=%ld",count_test);
     }
 }
-//-------------------------------------------------------------------------
-void flash_btock(void)
-{
-    uint8_t rdp_level = READ_BIT(FLASH->OPTR, FLASH_OPTR_RDPROT);
-    if (rdp_level != RDP_VAL)
-    {
-        if(READ_BIT(FLASH->PECR, FLASH_PECR_OPTLOCK))
-        {
-            /* Unlocking FLASH_PECR register access*/
-            if(READ_BIT(FLASH->PECR, FLASH_PECR_PELOCK))
-            {
-                /* Unlocking FLASH_PECR register access*/
-                WRITE_REG(FLASH->PEKEYR, 0x89ABCDEFU);
-                WRITE_REG(FLASH->PEKEYR, 0x02030405U);
-            }
-            /* Unlocking the option bytes block access */
-            WRITE_REG(FLASH->OPTKEYR, 0xFBEAD9C8U);
-            WRITE_REG(FLASH->OPTKEYR, 0x24252627U);
-        }
-//----------
-        uint32_t tmp1, tmp2;
-        tmp1 = (uint32_t)(OB->RDP & ((~FLASH_OPTR_RDPROT) & 0x0000FFFF));
-        /* Calculate the option byte to write */
-        tmp1 |= (uint32_t)(RDP_VAL);
-        tmp2 = (uint32_t)(((uint32_t)((uint32_t)(~tmp1) << 16U)) | tmp1);
-        /* Wait for last operation to be completed */
-        while((FLASH->SR) & (FLASH_SR_BSY));
-        /* program read protection level */
-        OB->RDP = tmp2;
-        /* Wait for last operation to be completed */
-        while((FLASH->SR) & (FLASH_SR_BSY));
-//----------
-        tmp2 = 0;
-        /* Get the User Option byte register */
-        tmp1 = OB->USER & ((~FLASH_OPTR_BOR_LEV) >> 16U);
-        /* Calculate the option byte to write - [0xFF | nUSER | 0x00 | USER]*/
-        tmp2 = (uint32_t)~((BOR_LEVEL | tmp1)) << 16U;
-        tmp2 |= (BOR_LEVEL | tmp1);
 
-        while((FLASH->SR) & (FLASH_SR_BSY));
-        /* Write the BOR Option Byte */
-        OB->USER = tmp2;
-        while((FLASH->SR) & (FLASH_SR_BSY));
-//----------
-        SET_BIT(FLASH->PECR, FLASH_PECR_OPTLOCK);
-    }
-}
-//-------------------------------------------------------------------------
-void iwdg_init(uint8_t x0_1s_time)
-{
-    LL_IWDG_Enable(IWDG);
-    LL_IWDG_EnableWriteAccess(IWDG);
-    LL_IWDG_SetPrescaler(IWDG, LL_IWDG_PRESCALER_256);
-    LL_IWDG_SetReloadCounter(IWDG, (144 * x0_1s_time)/10);
-    while(!LL_IWDG_IsReady(IWDG))
-    {
-        // Wait reary flag
-    }
-    LL_IWDG_ReloadCounter(IWDG);
-}
 //-------------------------------------------------------------------------
 int main(void)
 {
@@ -447,8 +389,8 @@ int main(void)
     {
         __WFI();
     }
-    address = IO_GetLineActive(io_addr0) | IO_GetLineActive(io_addr1) << 1 | IO_GetLineActive(io_addr2) << 2 | IO_GetLineActive(io_addr3) << 3;
-    mode = IO_GetLineActive(io_mode);
+    address = IO_GetLineActive(IO_ADDR0) | IO_GetLineActive(IO_ADDR1) << 1 | IO_GetLineActive(IO_ADDR2) << 2 | IO_GetLineActive(IO_ADDR3) << 3;
+    mode = IO_GetLineActive(IO_MODE);
     IO_UART_Init(mode);
 //    IO_DeConfigLine(io_addr0);
 //    IO_DeConfigLine(io_addr1);

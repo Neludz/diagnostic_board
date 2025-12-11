@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#include "stm32l0xx_ll_conf.h"
 #include "stm32l0xx.h"
 //----------------------------------------------
 // ALL IN ONE REG,  USE -> (OUT | PP | SP_VHI | NO_PULL)
@@ -64,7 +66,7 @@ typedef enum
 #define	ADC_V_HI_CHANNEL        6
 #define ADC_NUMBER_LIST        {ADC_TEMP_CHANNEL, ADC_V_MID_CHANNEL, ADC_V_HI_CHANNEL}
 #define MV_ADC  				3300
-#define ADC_COUNTS  			(1<<12)
+#define ADC_COUNTS  			(1<<10)
 #define MODE_LEGACY             0   //0 or 1
 #define BAUDRATE                38400
 
@@ -77,17 +79,17 @@ enum
 
 //          NAME    GPIOx   GPIO_Pin    MODE    AF  DefState  ActiveState
 #define IO_TABLE\
-	X_IO(io_addr0,			GPIOB,  3,      (IN | PULL_UP),	0,		0,  	LOW)	\
-	X_IO(io_addr1,			GPIOB,  5,      (IN | PULL_UP),	0,		0,  	LOW)	\
-    X_IO(io_addr2,			GPIOB,  4,      (IN | PULL_UP),	0,		0,  	LOW)	\
-    X_IO(io_addr3,			GPIOA,  15,     (IN | PULL_UP),	0,		0,  	LOW)	\
-    X_IO(io_mode,			GPIOA,  10,     (IN | PULL_UP),	0,		0,  	LOW)	\
-    X_IO(io_adc_temp_I4,	GPIOA,  4,      (AI | NO_PULL),	0,		0,  	LOW)	\
-    X_IO(io_adc_volt_mid_I7,GPIOA,  7,      (AI | NO_PULL),	0,		0,  	LOW)	\
-    X_IO(io_adc_volt_hi_I6, GPIOA,  6,      (AI | NO_PULL),	0,		0,  	LOW)	\
-    X_IO(io_uart_tx,        GPIOB,  6,      (ALT | PP | SP_VHI | NO_PULL),  AF_6,   0,  LOW)	\
-    X_IO(io_mid_error,      GPIOA,  9,      (IN | NO_PULL),	0,		0,  	LOW)	\
-    X_IO(io_hi_error,       GPIOA,  8,      (IN | NO_PULL),	0,		0,  	LOW)	\
+	X_IO(IO_ADDR0,			GPIOB,  3,      (IN | PULL_UP),	0,		0,  	LOW)	\
+	X_IO(IO_ADDR1,			GPIOB,  5,      (IN | PULL_UP),	0,		0,  	LOW)	\
+    X_IO(IO_ADDR2,			GPIOB,  4,      (IN | PULL_UP),	0,		0,  	LOW)	\
+    X_IO(IO_ADDR3,			GPIOA,  15,     (IN | PULL_UP),	0,		0,  	LOW)	\
+    X_IO(IO_MODE,			GPIOA,  10,     (IN | PULL_UP),	0,		0,  	LOW)	\
+    X_IO(IO_ADC_TEMP_I4,    GPIOA,  4,      (AI | NO_PULL),	0,		0,  	LOW)	\
+    X_IO(IO_ADC_VOLT_MID_I7,GPIOA,  7,      (AI | NO_PULL),	0,		0,  	LOW)	\
+    X_IO(IO_ADC_VOLT_HI_I6, GPIOA,  6,      (AI | NO_PULL),	0,		0,  	LOW)	\
+    X_IO(IO_UART_TX,        GPIOB,  6,      (ALT | PP | SP_VHI | NO_PULL),  AF_6,   0,  LOW)	\
+    X_IO(IO_MID_ERROR,      GPIOA,  9,      (IN | NO_PULL),	0,		0,  	LOW)	\
+    X_IO(IO_HI_ERROR,       GPIOA,  8,      (IN | NO_PULL),	0,		0,  	LOW)	\
 
 typedef enum
 {
@@ -97,11 +99,25 @@ typedef enum
     NUM_IO		//count
 } tIOLine;
 
+
+#define BOR_OFF                 ((uint8_t)0x00) /*!< BOR is disabled at power down, the reset is asserted when the VDD
+                                             power supply reaches the PDR(Power Down Reset) threshold (1.5V) */
+#define BOR_LEVEL1              ((uint8_t)0x08) /*!< BOR Reset threshold levels for 1.7V - 1.8V VDD power supply    */
+#define BOR_LEVEL2              ((uint8_t)0x09) /*!< BOR Reset threshold levels for 1.9V - 2.0V VDD power supply    */
+#define BOR_LEVEL3              ((uint8_t)0x0A) /*!< BOR Reset threshold levels for 2.3V - 2.4V VDD power supply    */
+#define BOR_LEVEL4              ((uint8_t)0x0B) /*!< BOR Reset threshold levels for 2.55V - 2.65V VDD power supply  */
+#define BOR_LEVEL5              ((uint8_t)0x0C)
+#define BOR_LEVEL               BOR_LEVEL2
+#define RDP_VAL                 0xBB
+
+#define IWDG_TIME_X_0_1S        200 // 20s
+
 void IO_Init(void);
 void IO_ADC_Init();
 void IO_DMA_Init();
 bool IO_GetLineActive(tIOLine Line);
 void IO_UART_Init(uint32_t mode);
 void IO_DeConfigLine(tIOLine Line);
-
+void flash_btock(void);
+void iwdg_init(uint8_t x0_1s_time);
 #endif /* _IO_H */

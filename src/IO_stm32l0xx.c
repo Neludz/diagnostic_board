@@ -6,6 +6,7 @@
 #include <stm32l0xx_ll_adc.h>
 #include <stm32l0xx_ll_lpuart.h>
 #include <stm32l0xx_ll_dma.h>
+#include "clock_l0xx.h"
 #include <main.h>
 //------------------------------- prototype -------------------------------------
 static void IO_ConfigLine(tGPIO_Line io);
@@ -113,7 +114,7 @@ void IO_ADC_Init(void)
     LL_ADC_SetCommonFrequencyMode(ADC1_COMMON, LL_ADC_CLOCK_FREQ_MODE_LOW);  //if adc clock low then 3,5 MHz
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_ADC1); // clock enable
     LL_ADC_SetClock(ADC1, LL_ADC_CLOCK_SYNC_PCLK_DIV1); // PCLK prescaler
-    LL_ADC_SetResolution(ADC1, LL_ADC_RESOLUTION_12B);        // Resolution
+    LL_ADC_SetResolution(ADC1, LL_ADC_RESOLUTION_10B);        // Resolution
 
     LL_ADC_EnableInternalRegulator(ADC1);
     LL_ADC_SetSamplingTimeCommonChannels(ADC1, LL_ADC_SAMPLINGTIME_3CYCLES_5);
@@ -176,4 +177,64 @@ void IO_DMA_Init(void)
     NVIC_EnableIRQ(DMA1_Channel1_IRQn); /* (1) */
     NVIC_SetPriority(DMA1_Channel1_IRQn,1); /* (2) */
 }
+//-------------------------------------------------------------------------
+void flash_btock(void)
+{
+    uint8_t rdp_level = READ_BIT(FLASH->OPTR, FLASH_OPTR_RDPROT);
+    if (rdp_level != RDP_VAL)
+    {
+        if(READ_BIT(FLASH->PECR, FLASH_PECR_OPTLOCK))
+        {
+            /* Unlocking FLASH_PECR register access*/
+            if(READ_BIT(FLASH->PECR, FLASH_PECR_PELOCK))
+            {
+                /* Unlocking FLASH_PECR register access*/
+                WRITE_REG(FLASH->PEKEYR, 0x89ABCDEFU);
+                WRITE_REG(FLASH->PEKEYR, 0x02030405U);
+            }
+            /* Unlocking the option bytes block access */
+            WRITE_REG(FLASH->OPTKEYR, 0xFBEAD9C8U);
+            WRITE_REG(FLASH->OPTKEYR, 0x24252627U);
+        }
+//----------
+        uint32_t tmp1, tmp2;
+        tmp1 = (uint32_t)(OB->RDP & ((~FLASH_OPTR_RDPROT) & 0x0000FFFF));
+        /* Calculate the option byte to write */
+        tmp1 |= (uint32_t)(RDP_VAL);
+        tmp2 = (uint32_t)(((uint32_t)((uint32_t)(~tmp1) << 16U)) | tmp1);
+        /* Wait for last operation to be completed */
+        while((FLASH->SR) & (FLASH_SR_BSY));
+        /* program read protection level */
+        OB->RDP = tmp2;
+        /* Wait for last operation to be completed */
+        while((FLASH->SR) & (FLASH_SR_BSY));
+//----------
+        tmp2 = 0;
+        /* Get the User Option byte register */
+        tmp1 = OB->USER & ((~FLASH_OPTR_BOR_LEV) >> 16U);
+        /* Calculate the option byte to write - [0xFF | nUSER | 0x00 | USER]*/
+        tmp2 = (uint32_t)~((BOR_LEVEL | tmp1)) << 16U;
+        tmp2 |= (BOR_LEVEL | tmp1);
 
+        while((FLASH->SR) & (FLASH_SR_BSY));
+        /* Write the BOR Option Byte */
+        OB->USER = tmp2;
+        while((FLASH->SR) & (FLASH_SR_BSY));
+//----------
+        SET_BIT(FLASH->PECR, FLASH_PECR_OPTLOCK);
+    }
+}
+//-------------------------------------------------------------------------
+void iwdg_init(uint8_t x0_1s_time)
+{
+    LL_IWDG_Enable(IWDG);
+    LL_IWDG_EnableWriteAccess(IWDG);
+    LL_IWDG_SetPrescaler(IWDG, LL_IWDG_PRESCALER_256);
+    LL_IWDG_SetReloadCounter(IWDG, (144 * x0_1s_time)/10);
+    while(!LL_IWDG_IsReady(IWDG))
+    {
+        // Wait reary flag
+    }
+    LL_IWDG_ReloadCounter(IWDG);
+}
+//-------------------------------------------------------------------------
