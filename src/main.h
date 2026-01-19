@@ -13,7 +13,6 @@ extern "C" {
 
 #define SYSTIMER_TICK           1000
 #define SYSTIMER_MS_TO_TICK(x)  ((SYSTIMER_TICK * x) / 1000)
-#define ADC_TIME                SYSTIMER_MS_TO_TICK(ADC_TIME_MS)
 
 #define DATA_UPDATE_MS          500
 

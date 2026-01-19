@@ -186,7 +186,7 @@ void adc_processing(void)
         if (adc_threshold_start_flag)
         {
             adc_threshold_start_flag = 0;
-            adc_delay = Main_Timer_Set(ADC_TIME);
+            adc_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(ADC_TIME_MS));
             adc_state = 0;
             adc_busy_flag = 1;
             LL_ADC_REG_StartConversion(ADC1);
@@ -204,7 +204,7 @@ void adc_processing(void)
     case 3:
         if (adc_threshold_start_flag == 1 || Timer_Is_Expired(adc_delay))
         {
-            adc_delay = Main_Timer_Set(ADC_TIME);
+            adc_delay = Main_Timer_Set(SYSTIMER_MS_TO_TICK(ADC_TIME_MS));
             adc_state = 0;
             adc_threshold_start_flag = 0;
             LL_ADC_EnableInternalRegulator(ADC1);
@@ -260,12 +260,12 @@ uint32_t fill_buffer_modern()
     if (adc_average_v_mid >= (ADC_COUNTS))
         delta = (ADC_COUNTS - 1);
     else
-        delta = adc_average_v_mid;
+        delta = adc_average_v_mid>>1;
     uart_buffer[1] = (((delta >> 7) & 0x7F) << 1) | 0x01;
     uart_buffer[2] = ((delta & 0x7F) << 1) | 0x01;
 
     if (adc_average_v_hi > adc_average_v_mid && adc_average_v_hi < (ADC_COUNTS))
-        delta = (adc_average_v_hi - adc_average_v_mid);
+        delta = (adc_average_v_hi - adc_average_v_mid)>>1;
     else
         delta = 0;
     uart_buffer[3] = (((delta >> 7) & 0x7F) << 1) | 0x01;
